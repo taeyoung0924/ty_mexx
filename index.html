@@ -1,0 +1,3151 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>megastudy</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #eaf6fd;
+      --panel: #f8fcff;
+      --input: #edf7fd;
+      --surface-soft: rgba(55, 145, 195, .065);
+      --line: #cfe5f3;
+      --interactive-line: rgba(24, 101, 145, .42);
+      --text: #173247;
+      --sub: #557183;
+      --primary: #176b9b;
+      --primary-active: #125c87;
+      --primary-contrast: #ffffff;
+      --primary-soft: rgba(23, 107, 155, .09);
+      --story-block: var(--panel);
+      --story-ink: var(--text);
+      --story-line: var(--line);
+      --danger: #9d3d36;
+      --danger-soft: rgba(157, 61, 54, .08);
+      --success: #35634a;
+      --success-soft: rgba(53, 99, 74, .09);
+      --notice-bg: #fffaf0;
+      --notice-head: #fff2c9;
+      --notice-line: #e8ca78;
+      --notice-ink: #8a6100;
+      --shadow: none;
+      --focus-shadow: rgba(0, 0, 0, .1) 0 4px 12px;
+      --button-shadow: rgba(255,255,255,.2) 0 .5px 0 inset, rgba(0,0,0,.2) 0 0 0 .5px inset, rgba(0,0,0,.05) 0 1px 2px;
+      --radius: 12px;
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #171715;
+      --panel: #1e1e1b;
+      --input: #242420;
+      --surface-soft: rgba(255, 255, 255, .045);
+      --line: rgba(244, 241, 232, .12);
+      --interactive-line: rgba(244, 241, 232, .34);
+      --text: #f4f1e8;
+      --sub: rgba(244, 241, 232, .62);
+      --primary: #f4f1e8;
+      --primary-active: #f4f1e8;
+      --primary-contrast: #1c1c1c;
+      --primary-soft: rgba(244, 241, 232, .09);
+      --story-block: var(--panel);
+      --story-ink: var(--text);
+      --story-line: var(--line);
+      --danger: #ef9c91;
+      --danger-soft: rgba(239, 156, 145, .1);
+      --success: #9bc9ad;
+      --success-soft: rgba(155, 201, 173, .1);
+      --notice-bg: #252218;
+      --notice-head: #302a18;
+      --notice-line: rgba(244, 196, 82, .38);
+      --notice-ink: #ffd36b;
+      --focus-shadow: rgba(0,0,0,.4) 0 4px 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: "Camera Plain Variable", "Pretendard", ui-sans-serif, system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      font-size: 9pt;
+    }
+
+    html { overflow-y: scroll; scrollbar-gutter: stable; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      background-image: radial-gradient(circle at 14% 3%, rgba(121, 202, 238, .20), transparent 30%), radial-gradient(circle at 88% 8%, rgba(92, 169, 218, .15), transparent 28%);
+      transition: color .2s ease, background-color .2s ease;
+      font-weight: 400;
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .app {
+      display: grid;
+      grid-template-columns: 210px minmax(650px, 1fr) 310px;
+      gap: 12px;
+      min-height: 100vh;
+      padding: 12px;
+      max-width: 1480px;
+      margin: 0 auto;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar, .editor { padding: 16px; }
+    .sidebar { min-width: 0; overflow: hidden; }
+    .content { display: grid; min-width: 0; align-content: start; gap: 12px; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { margin-bottom: 8px; font-weight: 600; letter-spacing: normal; }
+    .muted { color: var(--sub); }
+
+    .sidebar-brand {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      padding-bottom: 14px;
+      border-bottom: 0;
+    }
+
+    .sidebar-brand h1 { margin: 0; color: #0082ff; letter-spacing: -.35px; font-weight: 700; }
+    .header-actions { display: grid; grid-template-columns: 1fr 1fr 32px; gap: 6px; width: 100%; }
+    .header-actions .btn { min-width: 0; padding-inline: 7px; }
+    .theme-toggle { border-radius: 6px; }
+    .settings-button { width: auto; border-radius: 6px; }
+    .refresh-button { padding: 0 !important; background: transparent; box-shadow: none; }
+    :root[data-theme="dark"] body { background-image: radial-gradient(circle at 12% 4%, rgba(201, 122, 92, .08), transparent 28%), radial-gradient(circle at 88% 8%, rgba(101, 137, 173, .08), transparent 25%); }
+
+    .btn {
+      min-height: 30px;
+      padding: 6px 11px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: opacity .15s ease, box-shadow .15s ease, background-color .15s ease;
+    }
+
+    .btn:hover { box-shadow: var(--focus-shadow); }
+    .btn:active { opacity: .8; }
+    .btn-primary { color: var(--primary-contrast); background: var(--primary); box-shadow: var(--button-shadow); }
+    .btn-primary:active { background: var(--primary-active); }
+    .btn-secondary { color: var(--text); background: transparent; border-color: var(--interactive-line); }
+    .btn-danger { color: var(--danger); background: var(--danger-soft); border-color: var(--line); }
+    .btn-success { color: var(--success); background: var(--success-soft); border-color: var(--line); }
+
+    .search-panel { padding: 12px 16px; border-radius: var(--radius); box-shadow: none; }
+    .search-row { display: grid; grid-template-columns: 1fr; gap: 8px; }
+    .search-panel input, .search-panel select { background: var(--input); border-color: var(--line); border-radius: 6px; }
+    .search-panel input:focus, .search-panel select:focus { border-color: rgba(59, 130, 246, .5); box-shadow: var(--focus-shadow), 0 0 0 2px rgba(59, 130, 246, .18); }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 8px 10px;
+      color: var(--text);
+      background: var(--input);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      outline: none;
+    }
+
+    textarea { min-height: 90px; resize: vertical; line-height: 1.6; }
+    input:focus, select:focus, textarea:focus { border-color: rgba(59, 130, 246, .5); box-shadow: var(--focus-shadow), 0 0 0 2px rgba(59, 130, 246, .18); }
+
+    .category-list { display: grid; gap: 6px; margin-top: 14px; }
+    .category-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--input);
+      cursor: pointer;
+    }
+    .category-item.active { color: var(--text); border-color: var(--interactive-line); background: var(--primary-soft); font-weight: 600; }
+    .side-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; margin-top: 12px; }
+    .side-actions .btn { min-width: 0; padding-inline: 6px; white-space: nowrap; }
+    .category-toolbar { display: grid; grid-template-columns: auto minmax(150px, 1fr) auto; align-items: center; gap: 10px; padding: 12px 16px; }
+    .category-toolbar-title { display: grid; gap: 2px; min-width: 100px; }
+    .category-toolbar-title strong { font-weight: 600; }
+    .category-toolbar-actions { display: flex; gap: 6px; }
+    .category-toolbar-actions .btn { min-width: 54px; }
+    .sidebar-section { margin-top: 18px; padding-top: 0; border-top: 0; }
+    .sidebar-section h3 { margin: 0; }
+    .sidebar-section h3, .list-title strong, .field label, th {
+      font-family: inherit;
+      font-weight: 600;
+      letter-spacing: normal;
+    }
+    .sidebar-section-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; padding-bottom: 0; border-bottom: 0; }
+    .icon-btn { width: 24px; height: 24px; padding: 0; color: var(--text); background: var(--primary-soft); border: 1px solid var(--line); border-radius: 9999px; font-weight: 600; }
+    .mini-list { display: grid; gap: 0; min-width: 0; overflow: hidden; }
+    .mini-item {
+      display: block;
+      min-width: 0;
+      width: 100%;
+      padding: 9px 0;
+      overflow: hidden;
+      color: var(--text);
+      text-align: left;
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      border-radius: 0;
+    }
+    .mini-item:hover { color: var(--text); background: var(--surface-soft); }
+    .mini-item strong, .mini-item span { display: block; width: 100%; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mini-item span { margin-top: 3px; color: var(--sub); }
+    .sidebar-section .mini-item strong { font-weight: 400; }
+    .sidebar-section .icon-btn { width: auto; height: auto; padding: 0; background: transparent; border: 0; border-radius: 0; box-shadow: none; font-size: 12pt; font-weight: 400; }
+    .sidebar-section .icon-btn:hover { color: var(--primary); background: transparent; box-shadow: none; }
+    .issue-board { margin-top: 16px; }
+    .issue-group + .issue-group { margin-top: 18px; padding-top: 0; border-top: 0; }
+    .issue-list { display: grid; }
+    .issue-item { width: 100%; padding: 8px 0; overflow: hidden; color: var(--text); text-align: left; background: transparent; border: 0; border-bottom: 1px solid var(--line); text-overflow: ellipsis; white-space: nowrap; }
+    .issue-item:hover { color: var(--primary); background: var(--surface-soft); }
+    .issue-group .sidebar-section-head { min-height: 24px; align-items: center; }
+    .issue-group .sidebar-section-head h3 { line-height: 24px; }
+    .issue-action-group { display: flex; flex: 0 0 auto; align-items: center; gap: 0; transform: translateY(-2px); }
+    .issue-action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 4px;
+      color: var(--text);
+      background: transparent;
+      border: 0;
+      border-radius: 6px;
+      box-shadow: none;
+      white-space: nowrap;
+    }
+    .issue-action-btn:hover { color: var(--primary); background: var(--primary-soft); box-shadow: none; }
+    .issue-list-icon { width: 14px; height: 14px; vertical-align: middle; }
+    .issue-write-btn { min-width: 22px; padding-inline: 4px; }
+    .issue-archive { padding: 14px 16px; }
+    .issue-archive-list { display: grid; }
+    .issue-archive-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; width: 100%; padding: 11px 4px; color: var(--text); text-align: left; background: transparent; border: 0; border-bottom: 1px solid var(--line); }
+    .issue-archive-item:hover { background: var(--surface-soft); }
+    .issue-archive-item strong, .issue-archive-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .issue-archive-item span { color: var(--sub); }
+
+    .viewer { width: 100%; min-width: 0; max-width: 100%; overflow: hidden; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+    .viewer.notice-mode { background: var(--notice-bg); border-color: var(--notice-line); }
+    .viewer.notice-mode .viewer-head { background: var(--notice-head); border-color: var(--notice-line); }
+    .viewer.notice-mode .viewer-label { color: var(--notice-ink); }
+    .viewer.notice-mode .comments { border-top-color: var(--notice-line); }
+    .viewer-head {
+      display: grid;
+      grid-template-columns: 58px 1fr auto;
+      gap: 12px;
+      align-items: start;
+      padding: 15px 16px;
+      border-bottom: 1px solid var(--story-line);
+      background: var(--surface-soft);
+    }
+    .viewer-label { color: var(--text); font-weight: 600; }
+    .viewer-question { font-weight: 600; line-height: 1.6; white-space: pre-wrap; }
+    .viewer-meta { color: var(--sub); opacity: 1; white-space: nowrap; text-align: right; line-height: 1.6; }
+    .viewer-answer { display: grid; grid-template-columns: 58px 1fr; gap: 12px; min-height: 120px; padding: 18px 16px; line-height: 1.75; }
+    .viewer-answer-text { white-space: pre-wrap; }
+    .answer-image { display: block; max-width: min(100%, 680px); max-height: 440px; margin-top: 14px; border: 1px solid var(--line); border-radius: 9px; object-fit: contain; }
+    .viewer-empty { color: var(--sub); opacity: 1; }
+    .viewer-actions { display: flex; justify-content: flex-end; gap: 7px; padding: 0 16px 14px; }
+
+    .comments { margin: 0 16px 16px 86px; padding-top: 12px; border-top: 1px dashed var(--story-line); }
+    .comment-list { display: grid; min-width: 0; max-width: 100%; gap: 7px; margin: 8px 0; }
+    .comment-item { min-width: 0; max-width: 100%; padding: 9px 10px; overflow-wrap: anywhere; color: var(--text); background: var(--surface-soft); border: 1px solid var(--line); border-radius: 8px; line-height: 1.5; }
+    .comment-meta { display: flex; justify-content: space-between; color: var(--sub); opacity: 1; margin-bottom: 4px; }
+    .comment-form { display: grid; grid-template-columns: 100px 1fr auto; gap: 7px; }
+    .hidden { display: none !important; }
+
+    .list-panel { padding: 14px 16px 16px; }
+    .list-title { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .table-wrap { overflow: auto; }
+    .pagination { display: flex; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: 3px; padding-top: 10px; }
+    .page-btn { min-width: 24px; height: 24px; padding: 0 6px; color: var(--text); background: transparent; border: 1px solid var(--line); border-radius: 5px; font-size: 8pt; }
+    .page-btn:hover { border-color: var(--interactive-line); box-shadow: var(--focus-shadow); }
+    .page-btn.active { color: var(--primary-contrast); background: var(--primary); border-color: var(--primary); box-shadow: var(--button-shadow); }
+    .page-btn:disabled { cursor: default; opacity: .35; box-shadow: none; }
+    .page-ellipsis { padding: 0 3px; color: var(--sub); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 9px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--sub); background: var(--surface-soft); position: sticky; top: 0; }
+    tbody tr { cursor: pointer; }
+    tbody tr:hover td { background: var(--surface-soft); }
+    tbody tr.active td { background: var(--primary-soft); }
+    .empty { padding: 24px; text-align: center; color: var(--sub); }
+
+    .editor-grid { display: grid; gap: 10px; }
+    .editor-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .editor-heading h2 { margin: 0; }
+    .attachment-preview { display: grid; gap: 7px; padding: 9px; background: var(--surface-soft); border: 1px dashed var(--line); border-radius: 8px; }
+    .attachment-preview img { max-width: 100%; max-height: 220px; object-fit: contain; border-radius: 7px; }
+    #noticeModal { width: min(820px, calc(100vw - 32px)); }
+    .rich-editor {
+      min-height: 250px;
+      padding: 12px;
+      overflow: auto;
+      color: var(--text);
+      background: var(--input);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      outline: none;
+      line-height: 1.7;
+      white-space: normal;
+    }
+    .rich-editor:empty::before { color: var(--sub); content: attr(data-placeholder); pointer-events: none; }
+    .rich-editor:focus { border-color: rgba(59, 130, 246, .5); box-shadow: var(--focus-shadow), 0 0 0 2px rgba(59, 130, 246, .18); }
+    .rich-editor img, .viewer-answer-text img { display: block; max-width: 100%; max-height: 520px; margin: 12px auto; border: 1px solid var(--line); border-radius: 9px; object-fit: contain; }
+    .editor.expanded { position: fixed; z-index: 51; inset: 24px; width: min(900px, calc(100vw - 48px)); margin: auto; overflow: auto; }
+    .editor.expanded textarea { min-height: 180px; }
+    .backdrop { position: fixed; z-index: 50; inset: 0; background: rgba(15, 15, 14, .62); backdrop-filter: blur(3px); }
+    .modal { position: fixed; z-index: 61; inset: 50% auto auto 50%; width: min(520px, calc(100vw - 32px)); max-height: 78vh; padding: 20px; overflow: auto; transform: translate(-50%, -50%); box-shadow: var(--focus-shadow); }
+    .modal-backdrop { z-index: 60; }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .modal-head h2 { margin: 0; }
+    .modal-category-list { display: grid; gap: 6px; }
+    .modal-category-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px; }
+    .modal-category-row .category-item { width: 100%; }
+    .activity-detail-list { display: grid; gap: 0; }
+    .activity-detail-item { width: 100%; padding: 12px 2px; text-align: left; color: var(--text); background: transparent; border: 0; border-bottom: 1px solid var(--line); }
+    .activity-detail-item:hover { background: var(--surface-soft); }
+    .activity-detail-item strong, .activity-detail-item span, .activity-detail-item p { display: block; margin: 0; }
+    .activity-detail-item span { margin-top: 4px; color: var(--sub); }
+    .activity-detail-item p { margin-top: 7px; color: var(--sub); line-height: 1.55; }
+    .settings-modal { width: min(640px, calc(100vw - 32px)); }
+    .settings-tabs { display: flex; gap: 6px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+    .settings-tab.active { color: var(--primary-contrast); background: var(--primary); box-shadow: var(--button-shadow); }
+    .trash-list { display: grid; gap: 8px; }
+    .trash-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--line); }
+    .trash-item strong, .trash-item span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .trash-item span { margin-top: 4px; color: var(--sub); }
+    .settings-panel { min-height: 120px; }
+    .config-grid { display: grid; gap: 10px; }
+    .config-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+    .connection-status { padding: 10px; color: var(--sub); background: var(--surface-soft); border-radius: 8px; line-height: 1.55; }
+    .connection-status.connected { color: var(--success); }
+    .connection-status.error { color: var(--danger); }
+    .field { display: grid; gap: 5px; }
+    .field label { color: var(--sub); font-weight: 600; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .category-input-row { display: grid; grid-template-columns: 1fr; gap: 7px; }
+    .category-input-row > * { min-width: 0; }
+    .category-input-row.custom-active { grid-template-columns: minmax(84px, .8fr) minmax(0, 1.2fr) 42px; }
+    .category-input-row.custom-active .btn { width: 42px; padding-inline: 3px; white-space: nowrap; }
+    .editor-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .editor-note { padding: 10px; color: var(--sub); line-height: 1.6; background: var(--surface-soft); border-radius: 8px; }
+    .revision-panel { padding-top: 12px; border-top: 1px solid var(--line); }
+    .revision-panel h3 { margin-bottom: 7px; }
+    .revision-list { display: grid; gap: 0; }
+    .revision-row { display: grid; grid-template-columns: 90px 1fr auto; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+    .revision-row strong { color: var(--text); }
+    .revision-final { padding: 2px 7px; color: var(--primary-contrast); background: var(--primary); border-radius: 999px; }
+
+    @media (max-width: 1220px) {
+      .app { grid-template-columns: 220px 1fr; }
+      .editor { grid-column: 1 / -1; }
+    }
+    @media (max-width: 760px) {
+      .app { display: block; padding: 8px; }
+      .app > * { margin-bottom: 8px; }
+      .search-panel { border-radius: var(--radius); }
+      .search-row, .comment-form { grid-template-columns: 1fr; }
+      .category-toolbar { grid-template-columns: 1fr; }
+      .category-toolbar-actions { display: grid; grid-template-columns: repeat(4, 1fr); }
+      .category-input-row.custom-active { grid-template-columns: 1fr; }
+      .viewer-head { grid-template-columns: 48px 1fr; }
+      .viewer-meta { grid-column: 2; text-align: left; }
+      .viewer-answer { grid-template-columns: 48px 1fr; }
+      .viewer-actions, .comments { margin-left: 0; padding-left: 16px; }
+    }
+    /* 2026 MEXX redesign */
+    :root {
+      --bg: #f6f8fc;
+      --panel: #4776c5;
+      --input: #f7faff;
+      --surface-soft: rgba(255, 255, 255, .18);
+      --line: rgba(22, 57, 112, .24);
+      --interactive-line: rgba(255, 255, 255, .48);
+      --text: #12305a;
+      --sub: #557094;
+      --primary: #3f73c9;
+      --primary-active: #315fa8;
+      --primary-contrast: #ffffff;
+      --primary-soft: rgba(63, 115, 201, .12);
+      --story-block: #ffffff;
+      --story-ink: #16345d;
+      --story-line: rgba(30, 71, 132, .18);
+      --notice-bg: #fff8ec;
+      --notice-head: #fff1d8;
+      --notice-line: #f27b2d;
+      --notice-ink: #a94c08;
+      --shadow: none;
+      --radius: 72px;
+    }
+    :root[data-theme="dark"] {
+      --bg: #0b1626;
+      --panel: #244a89;
+      --input: #101f35;
+      --surface-soft: rgba(255,255,255,.09);
+      --line: rgba(187, 210, 255, .22);
+      --interactive-line: rgba(187, 210, 255, .42);
+      --text: #eef5ff;
+      --sub: #adc2e2;
+      --primary: #5d8fea;
+      --primary-active: #4778d0;
+      --primary-contrast: #ffffff;
+      --primary-soft: rgba(93, 143, 234, .18);
+      --story-block: #12243d;
+      --story-ink: #eef5ff;
+      --story-line: rgba(187, 210, 255, .2);
+    }
+    * { font-size: 11pt; }
+    body { background: var(--bg); background-image: none; }
+    :root[data-theme="dark"] body { background-image: none; }
+    .app {
+      display: grid;
+      grid-template-columns: minmax(300px, 470px) minmax(520px, 1104px);
+      grid-template-rows: 58px minmax(0, 1fr);
+      gap: 34px 40px;
+      min-height: 100vh;
+      max-width: 1740px;
+      padding: 0 52px 34px;
+      align-items: stretch;
+    }
+    .gnb {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 300px minmax(280px, 552px) auto;
+      gap: 28px;
+      align-items: center;
+      min-height: 58px;
+      margin: 0 -52px;
+      padding: 8px 64px;
+      color: #fff;
+      background: #051b35;
+      border-bottom: 5px solid #ff7b22;
+    }
+    .gnb-brand { display: flex; align-items: center; gap: 14px; min-width: 0; color: #fff; }
+    .gnb-brand img { width: 130px; max-height: 26px; object-fit: contain; }
+    .gnb-brand span { width: 1px; height: 22px; background: rgba(255,255,255,.75); }
+    .gnb-brand strong { font-size: 15pt; font-weight: 700; letter-spacing: 0; }
+    .gnb-search input {
+      height: 42px;
+      padding: 0 18px;
+      color: #fff;
+      background: #8d9296;
+      border: 2px solid #2f61b2;
+      border-radius: 7px;
+      font-size: 13pt;
+    }
+    .gnb-search input::placeholder { color: rgba(255,255,255,.92); }
+    .gnb-actions { display: flex; justify-content: flex-end; gap: 8px; min-width: 0; }
+    .gnb .btn {
+      min-height: 42px;
+      padding: 6px 18px;
+      color: #fff;
+      background: linear-gradient(#5d88d7, #376ec7);
+      border-color: #274f96;
+      border-radius: 7px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 1px 2px rgba(0,0,0,.22);
+      font-size: 14pt;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .gnb .refresh-button { width: auto; padding: 6px 18px !important; background: linear-gradient(#5d88d7, #376ec7); }
+    .panel { color: #fff; background: var(--panel); border: 2px solid rgba(26, 70, 137, .82); border-radius: var(--radius); }
+    .sidebar {
+      grid-column: 1;
+      grid-row: 2;
+      display: grid;
+      align-content: center;
+      min-height: calc(100vh - 128px);
+      padding: 70px 56px;
+    }
+    .notice-title h2 { margin: 0 0 86px; color: #fff; text-align: center; font-size: 27pt; font-weight: 500; }
+    .issue-board { display: grid; gap: 76px; margin: 0; }
+    .issue-group { position: relative; display: grid; gap: 12px; }
+    .issue-group + .issue-group { margin-top: 0; }
+    .issue-group .sidebar-section-head { justify-content: center; margin: 0; min-height: 0; }
+    .issue-group .sidebar-section-head h3 { color: #fff; font-size: 25pt; font-weight: 400; line-height: 1.1; }
+    .issue-action-group { position: absolute; right: 0; transform: none; }
+    .issue-action-btn { color: #fff; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); }
+    .issue-list { max-height: 92px; overflow: auto; }
+    .issue-item { color: rgba(255,255,255,.92); border-bottom-color: rgba(255,255,255,.2); }
+    .issue-item:hover { color: #fff; background: rgba(255,255,255,.12); }
+    .sidebar-section { display: none; }
+    .content { grid-column: 2; grid-row: 2; display: grid; grid-template-rows: minmax(260px, .95fr) minmax(300px, 1fr); gap: 34px; min-width: 0; }
+    .category-toolbar { display: none; }
+    .list-panel, .viewer, .issue-archive, .editor {
+      min-height: 0;
+      padding: 34px 42px;
+      color: #fff;
+      background: var(--panel);
+      border-color: rgba(26, 70, 137, .82);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .list-title { align-items: center; justify-content: center; min-height: 42px; margin-bottom: 18px; color: #fff; }
+    .list-title strong { color: #fff; font-size: 25pt; font-weight: 500; }
+    .list-title .muted { position: absolute; right: 44px; color: rgba(255,255,255,.78); }
+    .table-wrap { height: calc(100% - 86px); overflow: auto; border-radius: 18px; background: rgba(255,255,255,.13); }
+    table { color: #fff; }
+    th { color: rgba(255,255,255,.78); background: rgba(5, 27, 53, .22); }
+    th, td { border-bottom-color: rgba(255,255,255,.2); }
+    tbody tr:hover td, tbody tr.active td { background: rgba(255,255,255,.16); }
+    .pagination { justify-content: center; }
+    .page-btn { color: #fff; border-color: rgba(255,255,255,.35); }
+    .viewer { display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto; }
+    .viewer-head { grid-template-columns: 84px 1fr auto; padding: 0 0 20px; color: #fff; background: transparent; border-bottom-color: rgba(255,255,255,.24); }
+    .viewer-label, .viewer-question, .viewer-meta { color: #fff; }
+    .viewer-label { font-size: 20pt; font-weight: 500; }
+    .viewer-question { font-size: 18pt; }
+    .viewer-meta { color: rgba(255,255,255,.76); }
+    .viewer-answer { grid-template-columns: 84px 1fr; min-height: 0; padding: 28px 0; color: #fff; overflow: auto; }
+    .viewer-answer-text { font-size: 15pt; line-height: 1.75; }
+    .viewer-empty { color: rgba(255,255,255,.86); }
+    .viewer-actions { padding: 0; }
+    .comments { margin: 18px 0 0 84px; border-top-color: rgba(255,255,255,.24); }
+    .comment-item { color: #fff; background: rgba(255,255,255,.13); border-color: rgba(255,255,255,.2); }
+    .comment-meta, .muted { color: rgba(255,255,255,.76); }
+    .viewer .btn, .list-panel .btn, .editor .btn, .issue-archive .btn { color: #fff; border-color: rgba(255,255,255,.35); }
+    .viewer .btn-primary, .editor .btn-primary { background: #264f92; }
+    .viewer .btn-danger, .editor .btn-danger { color: #fff; background: rgba(173, 61, 46, .45); }
+    .issue-archive { grid-row: 1 / -1; }
+    .editor {
+      grid-column: 2;
+      grid-row: 2;
+      align-self: stretch;
+      overflow: auto;
+    }
+    .editor:not(.hidden) { display: block !important; }
+    .editor-heading h2 { color: #fff; font-size: 25pt; font-weight: 500; }
+    .field label, .revision-panel h3 { color: rgba(255,255,255,.86); }
+    input, select, textarea, .rich-editor { color: var(--text); background: #fff; border-color: rgba(15, 54, 113, .22); }
+    textarea { min-height: 120px; }
+    .editor-note, .attachment-preview { color: #fff; background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22); }
+    .revision-panel { border-top-color: rgba(255,255,255,.22); }
+    .revision-row { border-bottom-color: rgba(255,255,255,.18); }
+    .revision-row strong { color: #fff; }
+    @media (max-width: 1180px) {
+      .app { grid-template-columns: 1fr; grid-template-rows: auto auto auto; padding: 0 18px 24px; gap: 18px; }
+      .gnb { grid-template-columns: 1fr; margin: 0 -18px; padding: 10px 18px; gap: 10px; }
+      .gnb-actions { justify-content: flex-start; overflow: auto; }
+      .sidebar, .content, .editor { grid-column: 1; grid-row: auto; min-height: auto; }
+      .sidebar { padding: 44px 28px; }
+      .content { grid-template-rows: auto auto; }
+    }
+    @media (max-width: 760px) {
+      .panel, .list-panel, .viewer, .issue-archive, .editor { border-radius: 28px; padding: 24px 18px; }
+      .notice-title h2, .issue-group .sidebar-section-head h3, .list-title strong, .editor-heading h2 { font-size: 20pt; }
+      .issue-board { gap: 38px; }
+      .viewer-head, .viewer-answer { grid-template-columns: 1fr; }
+      .comments { margin-left: 0; }
+    }
+
+    /* 2026 clean Team Playbook redesign */
+    :root {
+      color-scheme: light;
+      --bg: #f4f5f8;
+      --panel: #ffffff;
+      --input: #f8fafc;
+      --surface-soft: #f6f7fb;
+      --line: #e7eaf0;
+      --interactive-line: #d8deea;
+      --text: #202633;
+      --sub: #737b8c;
+      --primary: #5268df;
+      --primary-active: #4056c5;
+      --primary-contrast: #ffffff;
+      --primary-soft: rgba(82, 104, 223, .09);
+      --story-block: #ffffff;
+      --story-ink: #202633;
+      --story-line: #e7eaf0;
+      --notice-bg: #ffffff;
+      --notice-head: #f8fafc;
+      --notice-line: #e7eaf0;
+      --notice-ink: #5268df;
+      --shadow: 0 10px 28px rgba(20, 28, 45, .06);
+      --focus-shadow: 0 10px 24px rgba(82, 104, 223, .16);
+      --button-shadow: 0 8px 16px rgba(82, 104, 223, .18);
+      --radius: 12px;
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #111827;
+      --panel: #172033;
+      --input: #111827;
+      --surface-soft: #1d2940;
+      --line: rgba(226, 232, 240, .12);
+      --interactive-line: rgba(226, 232, 240, .22);
+      --text: #eef2f7;
+      --sub: #9ba8ba;
+      --primary: #7c8cff;
+      --primary-active: #6575ea;
+      --primary-soft: rgba(124, 140, 255, .14);
+      --story-block: #172033;
+      --story-ink: #eef2f7;
+      --story-line: rgba(226, 232, 240, .12);
+      --notice-bg: #172033;
+      --notice-head: #1d2940;
+      --notice-line: rgba(226, 232, 240, .12);
+      --notice-ink: #91a0ff;
+      --shadow: 0 16px 36px rgba(0, 0, 0, .22);
+    }
+
+    * { font-size: 10pt; letter-spacing: 0; }
+    html { background: var(--bg); }
+    body { min-height: 100vh; color: var(--text); background: var(--bg); background-image: none; }
+    :root[data-theme="dark"] body { background-image: none; }
+
+    .app {
+      width: min(100%, 1280px);
+      max-width: none;
+      grid-template-columns: minmax(260px, 330px) minmax(0, 1fr);
+      grid-template-rows: 58px minmax(0, 1fr);
+      gap: 22px;
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 0 22px 22px;
+      align-items: stretch;
+    }
+
+    .gnb {
+      grid-column: 1 / -1;
+      width: 100vw;
+      min-height: 58px;
+      margin-left: calc(50% - 50vw);
+      margin-right: calc(50% - 50vw);
+      padding: 9px max(22px, calc((100vw - 1280px) / 2 + 22px));
+      display: grid;
+      grid-template-columns: minmax(240px, 330px) minmax(280px, 520px) auto;
+      gap: 22px;
+      align-items: center;
+      color: #ffffff;
+      background: #061a33;
+      border: 0;
+      border-bottom: 4px solid #ff7a1a;
+      box-shadow: none;
+    }
+
+    .gnb-brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .gnb-brand img { width: 118px; max-height: 24px; object-fit: contain; }
+    .gnb-brand span { width: 1px; height: 22px; background: rgba(255,255,255,.58); }
+    .gnb-brand strong { color: #fff; font-size: 14pt; font-weight: 700; white-space: nowrap; }
+    .gnb-search input {
+      height: 36px;
+      padding: 0 14px;
+      color: #202633;
+      background: #ffffff;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 8px;
+      box-shadow: inset 0 0 0 1px rgba(6, 26, 51, .04);
+      font-size: 10.5pt;
+    }
+    .gnb-search input::placeholder { color: #8b92a1; }
+    .gnb-actions { display: flex; justify-content: flex-end; gap: 8px; min-width: 0; }
+    .gnb .btn {
+      min-height: 28px;
+      padding: 4px 11px;
+      color: rgba(255,255,255,.88);
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 6px;
+      box-shadow: none;
+      font-size: 9pt;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .gnb .btn:hover { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.28); }
+    .gnb .btn-primary { color:#fff; background: #3a5bbf; border-color: #3a5bbf; box-shadow: 0 4px 12px rgba(58,91,191,.35); }
+    .gnb .btn-primary:hover { background: #4a6ecf; }
+    .gnb .refresh-button { width: auto; padding: 4px 11px !important; background: rgba(255,255,255,.07); box-shadow: none; }
+
+    .panel,
+    .list-panel,
+    .viewer,
+    .issue-archive,
+    .editor,
+    .modal {
+      color: var(--text);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar {
+      grid-column: 1;
+      grid-row: 2;
+      display: block;
+      min-height: auto;
+      padding: 22px;
+      overflow: hidden;
+    }
+
+    .notice-title h2 {
+      margin: 0 0 20px;
+      color: var(--text);
+      text-align: left;
+      font-size: 17pt;
+      font-weight: 750;
+    }
+
+    .issue-board { display: grid; gap: 16px; margin: 0; }
+    .issue-group {
+      position: relative;
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    .issue-group + .issue-group { margin-top: 0; padding-top: 16px; border-top: 1px solid var(--line); }
+    .issue-group .sidebar-section-head { justify-content: space-between; margin: 0; min-height: 0; }
+    .issue-group .sidebar-section-head h3 {
+      color: var(--text);
+      font-size: 12.5pt;
+      font-weight: 720;
+      line-height: 1.2;
+    }
+    .issue-action-group { position: static; transform: none; gap: 4px; }
+    .issue-action-btn {
+      min-width: 26px;
+      height: 26px;
+      color: var(--sub);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+    }
+    :root[data-theme="dark"] .issue-action-btn { background: #172033; }
+    .issue-action-btn:hover { color: var(--primary); background: var(--primary-soft); box-shadow: none; }
+    .issue-list { display: grid; max-height: 180px; overflow: auto; }
+    .issue-item {
+      padding: 9px 0;
+      color: var(--text);
+      border-bottom: 1px solid var(--line);
+      white-space: normal;
+      line-height: 1.45;
+    }
+    .issue-item:hover { color: var(--primary); background: transparent; }
+    .issue-list .muted { color: var(--sub); }
+    .sidebar-section { display: none; }
+
+    .content {
+      grid-column: 2;
+      grid-row: 2;
+      display: grid;
+      grid-template-rows: minmax(260px, .88fr) minmax(320px, 1fr);
+      gap: 22px;
+      min-width: 0;
+    }
+
+    .category-toolbar { display: none; }
+    .list-panel, .viewer, .issue-archive, .editor { min-height: 0; padding: 22px 26px; overflow: hidden; }
+    .list-title {
+      position: relative;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 28px;
+      margin-bottom: 14px;
+      color: var(--text);
+    }
+    .list-title strong { color: var(--text); font-size: 15pt; font-weight: 760; }
+    .list-title .muted { position: static; color: var(--sub); font-size: 9.5pt; }
+
+    .table-wrap {
+      height: calc(100% - 74px);
+      min-height: 170px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+    }
+    :root[data-theme="dark"] .table-wrap { background: #172033; }
+    table { color: var(--text); }
+    th {
+      padding: 10px 12px;
+      color: var(--sub);
+      background: var(--surface-soft);
+      font-size: 9pt;
+      font-weight: 700;
+    }
+    td { padding: 11px 12px; color: var(--text); border-bottom: 1px solid var(--line); }
+    tbody tr:hover td, tbody tr.active td { background: var(--primary-soft); }
+    .pagination { justify-content: flex-end; }
+    .page-btn { color: var(--text); border-color: var(--line); background: #fff; }
+    :root[data-theme="dark"] .page-btn { background: #172033; }
+
+    .viewer { display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto; }
+    .viewer.notice-mode { background: var(--panel); border-color: var(--line); }
+    .viewer.notice-mode .viewer-head { background: transparent; border-color: var(--line); }
+    .viewer.notice-mode .viewer-label { color: var(--primary); }
+    .viewer-head {
+      grid-template-columns: 86px 1fr auto;
+      gap: 14px;
+      padding: 0 0 16px;
+      color: var(--text);
+      background: transparent;
+      border-bottom: 1px solid var(--line);
+    }
+    .viewer-label { color: var(--sub); font-size: 10pt; font-weight: 760; text-transform: uppercase; }
+    .viewer-question { color: var(--text); font-size: 14pt; font-weight: 720; }
+    .viewer-meta { color: var(--sub); font-size: 9pt; }
+    .viewer-answer {
+      grid-template-columns: 86px minmax(0, 1fr);
+      min-height: 0;
+      padding: 18px 0;
+      color: var(--text);
+      overflow: auto;
+    }
+    .viewer-answer-text { color: var(--text); font-size: 10.5pt; line-height: 1.75; }
+    .viewer-empty { color: var(--sub); }
+    .viewer-actions { padding: 0; }
+    .comments { margin: 16px 0 0 86px; border-top: 1px dashed var(--line); }
+    .comment-item { color: var(--text); background: var(--surface-soft); border-color: var(--line); }
+    .comment-meta, .muted { color: var(--sub); }
+
+    .btn {
+      min-height: 32px;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+    .btn:hover { box-shadow: var(--focus-shadow); }
+    .btn-primary { color: #fff; background: var(--primary); border-color: var(--primary); box-shadow: var(--button-shadow); }
+    .btn-secondary { color: var(--text); background: #fff; border-color: var(--line); }
+    :root[data-theme="dark"] .btn-secondary { background: #172033; }
+    .btn-danger { color: #b42318; background: #fff5f4; border-color: #ffd8d4; }
+
+    input, select, textarea, .rich-editor {
+      color: var(--text);
+      background: var(--input);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    textarea { min-height: 116px; }
+
+    .editor {
+      grid-column: 2;
+      grid-row: 2;
+      align-self: stretch;
+      overflow: auto;
+    }
+    .editor:not(.hidden) { display: block !important; }
+    .editor-heading h2 { color: var(--text); font-size: 15pt; font-weight: 760; }
+    .field label, .revision-panel h3 { color: var(--sub); }
+    .editor-note, .attachment-preview { color: var(--text); background: var(--surface-soft); border-color: var(--line); }
+    .revision-panel { border-top-color: var(--line); }
+    .revision-row { border-bottom-color: var(--line); }
+    .revision-row strong { color: var(--text); }
+
+    .issue-archive { grid-row: 1 / -1; }
+    .modal { color: var(--text); }
+    .modal .muted { color: var(--sub); }
+
+    @media (max-width: 980px) {
+      .app {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        width: 100%;
+        padding: 0 14px 18px;
+        gap: 16px;
+      }
+      .gnb {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 10px 14px;
+      }
+      .gnb-actions { justify-content: flex-start; overflow: auto; }
+      .sidebar, .content, .editor { grid-column: 1; grid-row: auto; }
+      .content { grid-template-rows: auto auto; }
+    }
+
+    @media (max-width: 640px) {
+      .gnb-brand img { width: 106px; }
+      .gnb-brand strong { font-size: 12pt; }
+      .panel, .list-panel, .viewer, .issue-archive, .editor { border-radius: 10px; padding: 18px; }
+      .viewer-head, .viewer-answer { grid-template-columns: 1fr; }
+      .comments { margin-left: 0; }
+      .comment-form { grid-template-columns: 1fr; }
+      .table-wrap { height: auto; }
+    }
+
+    /* Calendar and schedule popover */
+    .sidebar { align-content: start; }
+    .calendar-card {
+      width: 100%;
+      min-height: 210px;
+      margin-bottom: 18px;
+      padding: 20px;
+      text-align: left;
+      color: var(--text);
+      background:
+        linear-gradient(135deg, rgba(82, 104, 223, .08), rgba(255, 122, 26, .06)),
+        #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 10px 28px rgba(20, 28, 45, .05);
+    }
+    .calendar-card:hover { border-color: rgba(82, 104, 223, .32); box-shadow: var(--focus-shadow); }
+    .calendar-card span, .calendar-card strong { display: block; }
+    .calendar-kicker {
+      color: var(--primary);
+      font-size: 9pt;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    #calendarDayLabel {
+      margin-top: 44px;
+      color: var(--text);
+      font-size: 30pt;
+      line-height: 1;
+      font-weight: 800;
+    }
+    #calendarDateLabel {
+      margin-top: 10px;
+      color: var(--sub);
+      font-size: 10.5pt;
+    }
+    .notice-title {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      margin: 0 -22px 14px;
+      padding: 8px 22px 12px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+    }
+    .notice-title h2 { margin: 0; }
+    .schedule-modal { width: min(620px, calc(100vw - 32px)); }
+    .schedule-list {
+      display: grid;
+      gap: 4px;
+      min-height: 92px;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+    .schedule-row {
+      position: relative;
+      display: grid;
+      grid-template-columns: 68px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      min-height: 36px;
+      padding: 7px 8px;
+      border-radius: 8px;
+    }
+    .schedule-row:hover { background: var(--surface-soft); }
+    .schedule-time { color: var(--text); font-weight: 760; }
+    .schedule-content { color: var(--text); overflow-wrap: anywhere; }
+    .schedule-actions {
+      display: flex;
+      gap: 5px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .14s ease;
+    }
+    .schedule-row:hover .schedule-actions {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .schedule-icon-btn {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      color: var(--sub);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      font-size: 10pt;
+      line-height: 1;
+    }
+    .schedule-icon-btn:hover { color: var(--primary); border-color: rgba(82, 104, 223, .32); }
+    .schedule-icon-btn.delete:hover { color: #b42318; border-color: #ffd8d4; background: #fff5f4; }
+    .schedule-form {
+      display: grid;
+      grid-template-columns: 110px minmax(0, 1fr) 72px;
+      gap: 8px;
+      align-items: center;
+    }
+    .schedule-empty {
+      padding: 22px;
+      color: var(--sub);
+      text-align: center;
+      background: var(--surface-soft);
+      border-radius: 8px;
+    }
+    :root[data-theme="dark"] .calendar-card,
+    :root[data-theme="dark"] .schedule-icon-btn {
+      background: #172033;
+    }
+    @media (max-width: 640px) {
+      .calendar-card { min-height: 150px; }
+      #calendarDayLabel { margin-top: 26px; font-size: 24pt; }
+      .schedule-form { grid-template-columns: 1fr; }
+      .schedule-row { grid-template-columns: 58px minmax(0, 1fr); }
+      .schedule-actions { grid-column: 2; opacity: 1; pointer-events: auto; }
+    }
+
+    /* Keep schedule controls visually hover-only, but reliably clickable. */
+    .schedule-actions { pointer-events: auto; }
+
+    /* Compact typography and monthly calendar refinement */
+    * { font-size: 9pt; }
+    .gnb-brand strong { font-size: 12.5pt; }
+    .gnb .btn { min-height: 32px; padding: 6px 10px; font-size: 9pt; }
+    .gnb-search input { height: 32px; font-size: 9.5pt; }
+    .btn { min-height: 28px; padding: 5px 9px; font-size: 9pt; }
+    input, select, textarea, .rich-editor { font-size: 9pt; }
+    .notice-title h2 { font-size: 13pt; }
+    .issue-group .sidebar-section-head h3 { font-size: 10.5pt; font-weight: 720; }
+    .list-title strong, .editor-heading h2 { font-size: 12.5pt; }
+    .viewer-label { font-size: 8.5pt; }
+    .viewer-question { font-size: 11.5pt; }
+    .viewer-answer-text { font-size: 9.5pt; }
+    .viewer-meta, .list-title .muted, th { font-size: 8.5pt; }
+    td, .issue-item, .comment-item, .schedule-row { font-size: 9pt; }
+    .modal-head h2 { font-size: 12.5pt; }
+
+    .calendar-card {
+      min-height: 0;
+      padding: 18px 16px 16px;
+      background: #fff;
+      box-shadow: 0 8px 22px rgba(20, 28, 45, .04);
+    }
+    .calendar-card:hover { box-shadow: 0 10px 24px rgba(20, 28, 45, .08); }
+    .mini-calendar-head {
+      display: grid;
+      grid-template-columns: 24px 1fr 24px;
+      align-items: center;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+    .mini-calendar-head strong {
+      text-align: center;
+      font-size: 10.5pt;
+      font-weight: 760;
+    }
+    .calendar-nav {
+      color: #b3bac7;
+      font-size: 17pt;
+      line-height: 1;
+      text-align: center;
+    }
+    .mini-calendar-weekdays,
+    .mini-calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      align-items: center;
+      text-align: center;
+    }
+    .mini-calendar-weekdays {
+      margin-bottom: 8px;
+      color: #a5adba;
+      font-size: 7.4pt;
+      font-weight: 760;
+    }
+    .mini-calendar-weekdays span { font-size: 7.4pt; }
+    .mini-calendar-grid { row-gap: 7px; }
+    .mini-calendar-day {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      margin: 0 auto;
+      color: #4b5563;
+      border-radius: 50%;
+      font-size: 10pt;
+      font-weight: 650;
+    }
+    .mini-calendar-day.empty { visibility: hidden; }
+    .mini-calendar-day.today {
+      color: #fff;
+      background: #f05a2a;
+      box-shadow: 0 6px 14px rgba(240, 90, 42, .22);
+    }
+
+    .issue-board { gap: 12px; }
+    .issue-group,
+    .issue-group + .issue-group {
+      padding: 0 0 12px;
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      border-radius: 0;
+    }
+    .issue-group:last-child { border-bottom: 0; padding-bottom: 0; }
+    .issue-list { max-height: 120px; }
+    .issue-item { padding: 7px 0; }
+    .issue-action-btn {
+      min-width: 23px;
+      height: 23px;
+      background: #fff;
+    }
+    .sidebar { padding: 18px; }
+    .notice-title {
+      margin: 0 -18px 12px;
+      padding: 7px 18px 10px;
+    }
+    .list-panel, .viewer, .issue-archive, .editor { padding: 18px 22px; }
+    .table-wrap { height: calc(100% - 62px); }
+    th, td { padding: 8px 10px; }
+    .viewer-head { padding-bottom: 12px; }
+    .viewer-answer { padding: 14px 0; }
+
+    @media (max-width: 640px) {
+      .calendar-card { min-height: 0; }
+      .mini-calendar-day { width: 26px; height: 26px; font-size: 9.5pt; }
+    }
+
+
+    /* Sidebar spacing and divider cleanup */
+    .calendar-card {
+      margin-bottom: 26px;
+    }
+    .notice-title {
+      margin: 0 -18px 20px;
+      padding: 9px 18px 12px;
+      border-bottom: 0;
+    }
+    .issue-board {
+      gap: 22px;
+    }
+    .issue-group,
+    .issue-group + .issue-group {
+      padding-bottom: 0;
+    }
+    .issue-group .sidebar-section-head {
+      margin-bottom: 10px;
+    }
+    .issue-list {
+      gap: 5px;
+    }
+    .issue-item,
+    .mini-item,
+    .issue-archive-item,
+    .activity-detail-item,
+    .trash-item {
+      border-bottom: 0;
+    }
+    .issue-item {
+      padding: 3px 0;
+      line-height: 1.45;
+    }
+    .issue-item:hover {
+      background: transparent;
+    }
+
+
+    /* Notice list dates and editor navigation refinements */
+    .issue-group .sidebar-section-head {
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--line);
+    }
+    .issue-group,
+    .issue-group + .issue-group,
+    .issue-group:last-child {
+      border-bottom: 0;
+    }
+    .issue-list {
+      gap: 4px;
+      padding-top: 2px;
+    }
+    .issue-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 76px;
+      align-items: baseline;
+      column-gap: 8px;
+      padding: 2px 0 2px 8px;
+      border-bottom: 0;
+      line-height: 1.45;
+    }
+    .issue-item-title {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .issue-item-date {
+      color: var(--sub);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0;
+      text-align: left;
+      white-space: nowrap;
+    }
+    #clearFormBtn.btn-secondary,
+    .editor-actions .btn-secondary {
+      color: var(--text);
+      background: #fff;
+      border-color: #cfd6e4;
+    }
+    .gnb .btn-primary.is-list-mode {
+      background: #fff;
+      color: #0b1f3a;
+      border-color: rgba(255, 255, 255, .72);
+      box-shadow: none;
+    }
+
+
+    /* Calendar navigation, selected dates, and Notice archive table */
+    .calendar-nav {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color .15s ease, color .15s ease;
+    }
+    .calendar-nav:hover {
+      color: var(--primary);
+      background: #eef8ff;
+    }
+    .mini-calendar-day {
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+    .mini-calendar-day.empty {
+      cursor: default;
+      pointer-events: none;
+    }
+    .mini-calendar-day.today {
+      color: #17415d;
+      background: #d8efff;
+      border-radius: 8px;
+      box-shadow: none;
+    }
+    .mini-calendar-day:not(.empty):hover {
+      color: var(--primary);
+      background: #eef8ff;
+      border-radius: 8px;
+    }
+    .issue-archive {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 6px;
+    }
+    .issue-archive.hidden {
+      display: none !important;
+    }
+    .issue-archive-list {
+      min-height: 0;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+    .issue-archive-table-wrap {
+      height: auto;
+      max-height: 100%;
+      overflow: auto;
+    }
+    .issue-archive-table th:first-child,
+    .issue-archive-table td:first-child {
+      width: 64px;
+      text-align: center;
+    }
+    .issue-archive-table th:nth-child(3),
+    .issue-archive-table td:nth-child(3) {
+      width: 120px;
+    }
+    .issue-archive-table th:nth-child(4),
+    .issue-archive-table td:nth-child(4) {
+      width: 210px;
+      white-space: nowrap;
+    }
+    .issue-archive-pagination {
+      padding-top: 12px;
+    }
+
+
+    /* Notice archive height and detail distinction */
+    .issue-archive {
+      grid-row: auto;
+      align-self: start;
+    }
+    .issue-archive-list {
+      grid-template-rows: auto auto;
+    }
+    .issue-archive-table-wrap {
+      max-height: 476px;
+      overflow-y: auto;
+    }
+    .issue-archive-table {
+      table-layout: fixed;
+    }
+    .issue-archive-table th,
+    .issue-archive-table td {
+      height: 40px;
+      box-sizing: border-box;
+    }
+    .issue-archive-table td:nth-child(2) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .viewer.notice-mode .viewer-head {
+      padding: 16px 18px;
+      background: #f3f8ff;
+      border: 1px solid #d9e8ff;
+      border-radius: 10px;
+    }
+    .viewer.notice-mode .viewer-answer {
+      padding-top: 18px;
+    }
+    :root[data-theme="dark"] .viewer.notice-mode .viewer-head {
+      background: rgba(145, 160, 255, .1);
+      border-color: rgba(145, 160, 255, .22);
+    }
+
+  </style>
+</head>
+<body>
+    <div class="app">
+    <header class="gnb">
+      <div class="gnb-brand"><img src="./mexx_white.png" alt="MEXX"><span></span><strong>Team Playbook</strong></div>
+      <div class="gnb-search"><input type="text" id="searchInput" placeholder="질문 또는 답변 검색"></div>
+      <div class="gnb-actions">
+        <button class="btn btn-primary" id="addFaqBtn" type="button">FAQ추가</button>
+        <button class="btn btn-secondary settings-button" id="settingsBtn" type="button" aria-label="설정 열기">설정</button>
+        <button class="btn btn-secondary theme-toggle" id="themeToggleBtn" type="button" aria-label="화면 테마 변경"><span id="themeLabel">다크</span></button>
+        <button class="btn btn-secondary refresh-button" id="newItemBtn" type="button" aria-label="새로고침" title="새로고침">새로고침</button>
+      </div>
+    </header>
+
+    <aside class="panel sidebar">
+      <button class="calendar-card" id="calendarCardBtn" type="button" aria-label="오늘 주요 일정 열기">
+        <div class="mini-calendar-head">
+          <span class="calendar-nav" data-calendar-nav="-1" aria-hidden="true">‹</span>
+          <strong id="calendarMonthLabel"></strong>
+          <span class="calendar-nav" data-calendar-nav="1" aria-hidden="true">›</span>
+        </div>
+        <div class="mini-calendar-weekdays" aria-hidden="true">
+          <span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span>
+        </div>
+        <div class="mini-calendar-grid" id="calendarGrid"></div>
+      </button>
+      <div class="notice-title">
+        <h2>Notice</h2>
+      </div><div class="issue-board">
+        <div class="issue-group">
+          <div class="sidebar-section-head">
+            <h3>Must-Read</h3>
+            <div class="issue-action-group">
+              <button class="issue-action-btn" data-show-notice-list="monthly" type="button" title="Must-Read list" aria-label="Must-Read list"><svg class="issue-list-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3.5h1M6 3.5h7M3 8h1M6 8h7M3 12.5h1M6 12.5h7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+              <button class="issue-action-btn issue-write-btn" data-add-notice="monthly" type="button" title="Add Must-Read notice" aria-label="Add Must-Read notice">+</button>
+            </div>
+          </div>
+          <div class="issue-list" id="monthlyIssueList"></div>
+        </div>
+        <div class="issue-group">
+          <div class="sidebar-section-head">
+            <h3>Weekly Heads-up</h3>
+            <div class="issue-action-group">
+              <button class="issue-action-btn" data-show-notice-list="weekly" type="button" title="Weekly Heads-up list" aria-label="Weekly Heads-up list"><svg class="issue-list-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3.5h1M6 3.5h7M3 8h1M6 8h7M3 12.5h1M6 12.5h7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+              <button class="issue-action-btn issue-write-btn" data-add-notice="weekly" type="button" title="Add Weekly Heads-up notice" aria-label="Add Weekly Heads-up notice">+</button>
+            </div>
+          </div>
+          <div class="issue-list" id="weeklyIssueList"></div>
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-head"><h3>최근 추가된 글</h3><button class="icon-btn" id="recentPostMoreBtn" title="최근 글 자세히 보기">+</button></div>
+        <div class="mini-list" id="recentPostList"></div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-head"><h3>최신 댓글</h3><button class="icon-btn" id="recentCommentMoreBtn" title="최신 댓글 자세히 보기">+</button></div>
+        <div class="mini-list" id="recentCommentList"></div>
+      </div>
+    </aside>
+
+    <main class="content" id="contentPanel">
+<section class="panel category-toolbar" id="categoryToolbar">
+        <div class="category-toolbar-title"><strong>카테고리</strong><span class="muted">질문 분류</span></div>
+        <select id="categoryFilter" aria-label="카테고리 선택"></select>
+        <div class="category-toolbar-actions">
+          <button class="btn btn-primary" id="addCategoryBtn">추가</button>
+          <button class="btn btn-secondary" id="editCategoryBtn">수정</button>
+          <button class="btn btn-secondary" id="showAllBtn">전체</button>
+          <button class="btn btn-secondary" id="resetFilterBtn">초기화</button>
+        </div>
+      </section>
+
+      <section class="panel issue-archive hidden" id="issueArchivePanel">
+        <div class="list-title">
+          <strong id="issueArchiveTitle">이슈사항 전체 목록</strong>
+          <button class="btn btn-secondary" id="backToQuestionListBtn" type="button">질문 목록</button>
+        </div>
+        <div class="issue-archive-list" id="issueArchiveList"></div>
+      </section>
+
+      <section class="panel list-panel" id="questionListPanel">
+        <div class="list-title">
+          <strong>Questions</strong>
+          <span class="muted" id="listInfo"></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>카테고리</th><th>질문</th><th>작성자</th><th>작성일시</th></tr></thead>
+            <tbody id="itemTableBody"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </section>
+
+      <section class="panel viewer" id="viewerPanel">
+        <div class="viewer-head">
+          <div class="viewer-label" id="viewQuestionLabel">Question</div>
+          <div class="viewer-question viewer-empty" id="viewQuestion">위 목록에서 질문을 선택해 주세요.</div>
+          <div class="viewer-meta" id="viewMeta">작성자 -<br>작성일시 -<br>최종 수정일시 -</div>
+        </div>
+        <div class="viewer-answer">
+          <div class="viewer-label" id="viewAnswerLabel">Answer</div>
+          <div>
+            <div class="viewer-answer-text viewer-empty" id="viewAnswer">선택한 질문의 답변이 여기에 표시됩니다.</div>
+            <img class="answer-image hidden" id="viewAnswerImage" alt="답변 첨부 이미지">
+          </div>
+        </div>
+        <div class="viewer-actions" id="viewerActions">
+          <button class="btn btn-secondary" id="viewerEditBtn">수정</button>
+          <button class="btn btn-danger" id="viewerDeleteBtn">삭제</button>
+        </div>
+        <div class="comments" id="commentArea">
+          <strong>댓글</strong>
+          <div class="comment-list" id="commentList"></div>
+          <div class="comment-form">
+            <input type="text" id="commentAuthor" placeholder="작성자">
+            <input type="text" id="commentText" placeholder="댓글을 입력해 주세요">
+            <button class="btn btn-primary" id="addCommentBtn">등록</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="panel editor hidden" id="editorPanel">
+      <div class="editor-heading">
+        <h2 id="editorTitle">Add FAQ</h2>
+        <button class="btn btn-secondary" id="expandEditorBtn">크게 보기</button>
+      </div>
+      <p class="muted">내용을 작성한 뒤 저장해 주세요.</p>
+      <div class="editor-grid">
+        <div class="field">
+          <label for="itemCategory">카테고리</label>
+          <div class="category-input-row" id="categoryInputRow">
+            <select id="itemCategory"></select>
+            <input class="hidden" type="text" id="customCategoryName" placeholder="새 카테고리 이름">
+            <button class="btn btn-primary hidden" type="button" id="confirmCustomCategoryBtn">추가</button>
+          </div>
+        </div>
+        <div class="field"><label for="editorName">작성자</label><input type="text" id="editorName" placeholder="이름"></div>
+        <div class="field"><label for="itemQuestion">질문</label><textarea id="itemQuestion" placeholder="질문을 입력하세요"></textarea></div>
+        <div class="field"><label for="itemAnswer">답변</label><textarea id="itemAnswer" placeholder="답변을 입력하세요"></textarea><span class="muted">답변 입력창에 이미지를 붙여넣으면 자동으로 첨부됩니다.</span></div>
+        <div class="field">
+          <label for="answerImageInput">답변 이미지 첨부</label>
+          <input type="file" id="answerImageInput" accept="image/*">
+          <div class="attachment-preview hidden" id="attachmentPreview">
+            <img id="attachmentPreviewImage" alt="첨부 이미지 미리보기">
+            <button class="btn btn-danger" id="removeImageBtn" type="button">첨부 이미지 삭제</button>
+          </div>
+        </div>
+        <div class="editor-actions">
+          <button class="btn btn-primary" id="saveItemBtn">저장</button>
+          <button class="btn btn-secondary" id="clearFormBtn">목록으로</button>
+        </div>
+        <div class="editor-note" id="editorStatus">새 질문을 등록할 수 있습니다.</div>
+        <div class="revision-panel">
+          <h3>수정 이력</h3>
+          <div class="revision-list" id="revisionHistoryList"><span class="muted">질문을 선택하면 수정 이력이 표시됩니다.</span></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="backdrop hidden" id="editorBackdrop"></div>
+  <div class="backdrop modal-backdrop hidden" id="categoryModalBackdrop"></div>
+  <section class="panel modal hidden" id="categoryModal" role="dialog" aria-modal="true" aria-labelledby="categoryModalTitle">
+    <div class="modal-head">
+      <h2 id="categoryModalTitle">전체 카테고리</h2>
+      <button class="btn btn-secondary" id="closeCategoryModalBtn">닫기</button>
+    </div>
+    <div class="modal-category-list" id="modalCategoryList"></div>
+  </section>
+  <div class="backdrop modal-backdrop hidden" id="activityModalBackdrop"></div>
+  <section class="panel modal hidden" id="activityModal" role="dialog" aria-modal="true" aria-labelledby="activityModalTitle">
+    <div class="modal-head">
+      <h2 id="activityModalTitle">최근 내역</h2>
+      <button class="btn btn-secondary" id="closeActivityModalBtn">닫기</button>
+    </div>
+    <div class="activity-detail-list" id="activityModalList"></div>
+  </section>
+  <div class="backdrop modal-backdrop hidden" id="scheduleModalBackdrop"></div>
+  <section class="panel modal schedule-modal hidden" id="scheduleModal" role="dialog" aria-modal="true" aria-labelledby="scheduleModalTitle">
+    <div class="modal-head">
+      <div>
+        <h2 id="scheduleModalTitle">오늘 주요 일정</h2>
+        <span class="muted" id="scheduleModalDate"></span>
+      </div>
+      <button class="btn btn-secondary" id="closeScheduleModalBtn" type="button">닫기</button>
+    </div>
+    <div class="schedule-list" id="scheduleList"></div>
+    <div class="schedule-form">
+      <input type="time" id="scheduleTimeInput" aria-label="시간">
+      <input type="text" id="scheduleContentInput" placeholder="주요내용" aria-label="주요내용">
+      <button class="btn btn-primary" id="addScheduleBtn" type="button">추가</button>
+    </div>
+  </section>
+
+  <div class="backdrop modal-backdrop hidden" id="settingsModalBackdrop"></div>
+  <section class="panel modal settings-modal hidden" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+    <div class="modal-head">
+      <h2 id="settingsModalTitle">설정</h2>
+      <button class="btn btn-secondary" id="closeSettingsModalBtn">닫기</button>
+    </div>
+    <div class="settings-panel" id="trashSettingsPanel">
+      <h3>휴지통</h3>
+      <div class="trash-list" id="trashList"></div>
+    </div>
+    <div class="settings-panel" style="margin-top:18px;padding-top:16px;border-top:1px solid var(--line);">
+      <h3>데이터 초기화</h3>
+      <p style="color:var(--sub);margin:6px 0 12px;line-height:1.55;">선택한 데이터를 영구 삭제합니다. 복구할 수 없습니다.</p>
+      <button class="btn btn-danger" id="openResetPanelBtn" type="button" style="border-color:#ffd8d4;">초기화</button>
+    </div>
+  </section>
+
+  <!-- 초기화 비밀번호 모달 -->
+  <div class="backdrop modal-backdrop hidden" id="resetPwBackdrop"></div>
+  <section class="panel modal hidden" id="resetPwModal" role="dialog" aria-modal="true" style="width:min(380px,calc(100vw - 32px));">
+    <div class="modal-head">
+      <h2>초기화 잠금 해제</h2>
+      <button class="btn btn-secondary" id="closeResetPwBtn" type="button">닫기</button>
+    </div>
+    <div style="display:grid;gap:10px;">
+      <label style="color:var(--sub);font-size:9pt;">암호를 입력하세요</label>
+      <input type="password" id="resetPwInput" placeholder="암호" autocomplete="off">
+      <div id="resetPwError" style="color:#b42318;font-size:8.5pt;display:none;">암호가 올바르지 않습니다.</div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px;">
+        <button class="btn btn-secondary" id="cancelResetPwBtn" type="button">취소</button>
+        <button class="btn btn-primary" id="confirmResetPwBtn" type="button">확인</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 초기화 항목 선택 모달 -->
+  <div class="backdrop modal-backdrop hidden" id="resetSelectBackdrop"></div>
+  <section class="panel modal hidden" id="resetSelectModal" role="dialog" aria-modal="true" style="width:min(380px,calc(100vw - 32px));">
+    <div class="modal-head">
+      <h2>초기화할 항목 선택</h2>
+      <button class="btn btn-secondary" id="closeResetSelectBtn" type="button">닫기</button>
+    </div>
+    <div style="display:grid;gap:10px;margin-bottom:16px;">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 10px;border:1px solid var(--line);border-radius:8px;">
+        <input type="checkbox" id="resetChkFaq" style="width:16px;height:16px;flex-shrink:0;"> 질문/답변
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 10px;border:1px solid var(--line);border-radius:8px;">
+        <input type="checkbox" id="resetChkMustRead" style="width:16px;height:16px;flex-shrink:0;"> Must-Read
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 10px;border:1px solid var(--line);border-radius:8px;">
+        <input type="checkbox" id="resetChkWeekly" style="width:16px;height:16px;flex-shrink:0;"> Weekly Heads-up
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 10px;border:1px solid var(--line);border-radius:8px;">
+        <input type="checkbox" id="resetChkCalendar" style="width:16px;height:16px;flex-shrink:0;"> Calendar
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 10px;border:1px solid var(--interactive-line);border-radius:8px;background:var(--surface-soft);">
+        <input type="checkbox" id="resetChkAll" style="width:16px;height:16px;flex-shrink:0;"> <strong>All (전체 선택)</strong>
+      </label>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-secondary" id="cancelResetSelectBtn" type="button">취소</button>
+      <button class="btn btn-danger" id="confirmResetSelectBtn" type="button" style="border-color:#ffd8d4;">초기화</button>
+    </div>
+  </section>
+
+  <div class="backdrop modal-backdrop hidden" id="noticeModalBackdrop"></div>
+  <section class="panel modal hidden" id="noticeModal" role="dialog" aria-modal="true" aria-labelledby="noticeModalTitle">
+    <div class="modal-head">
+      <h2 id="noticeModalTitle">Add Notice</h2>
+      <button class="btn btn-secondary" id="closeNoticeModalBtn" type="button">닫기</button>
+    </div>
+    <div class="config-grid">
+      <div class="field"><label for="noticeType">구분</label><select id="noticeType"><option value="monthly">Must-Read</option><option value="weekly">Weekly Heads-up</option></select></div>
+      <div class="field"><label for="noticeAuthor">작성자</label><input type="text" id="noticeAuthor" placeholder="이름"></div>
+      <div class="field"><label for="noticeTitle">제목</label><input type="text" id="noticeTitle" placeholder="공지 제목"></div>
+      <div class="field">
+        <label for="noticeContent">내용</label>
+        <div class="rich-editor" id="noticeContent" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="공지 내용을 입력하세요"></div>
+        <span class="muted">본문에서 원하는 위치를 클릭한 뒤 이미지를 붙여넣으세요.</span>
+      </div>
+      <div class="field">
+        <label for="noticeImageInput">공지 이미지 첨부</label>
+        <input type="file" id="noticeImageInput" accept="image/*">
+        <span class="muted">내용 입력칸에 이미지를 붙여넣어도 자동으로 첨부됩니다.</span>
+        <div class="attachment-preview hidden" id="noticeAttachmentPreview">
+          <img id="noticeAttachmentPreviewImage" alt="공지 첨부 이미지 미리보기">
+          <button class="btn btn-danger" id="removeNoticeImageBtn" type="button">첨부 이미지 삭제</button>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="saveNoticeBtn" type="button">저장</button>
+    </div>
+  </section>
+
+  <script src="./supabase-config.js"></script>
+  <script>
+    const STORAGE = 'rsdc_faq_items_v2';
+    const CATEGORY_STORAGE = 'rsdc_faq_categories_v2';
+    const TRASH_STORAGE = 'rsdc_faq_trash_v1';
+    const NOTICE_STORAGE = 'rsdc_faq_notices_v1';
+    const SCHEDULE_STORAGE = 'rsdc_faq_schedules_v1';
+    const SUPABASE_SDK_URL = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    const THEME_STORAGE = 'rsdc_faq_theme_v1';
+    const $ = id => document.getElementById(id);
+    const makeId = prefix => `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const nowISO = () => new Date().toISOString();
+    const formatDate = iso => iso ? new Date(iso).toLocaleString('ko-KR') : '-';
+    const formatCompactDate = iso => {
+      if (!iso) return '-';
+      const date = new Date(iso);
+      if (Number.isNaN(date.getTime())) return '-';
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${month}/${day} ${hours}:${minutes}`;
+    };
+    const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));
+
+    function sanitizeNoticeHtml(html) {
+      const allowed = new Set(['DIV', 'P', 'BR', 'IMG', 'B', 'STRONG', 'I', 'EM', 'U', 'UL', 'OL', 'LI']);
+      const source = document.createElement('div');
+      const output = document.createElement('div');
+      source.innerHTML = String(html || '');
+      const copySafeNode = node => {
+        if (node.nodeType === Node.TEXT_NODE) return document.createTextNode(node.textContent || '');
+        if (node.nodeType !== Node.ELEMENT_NODE) return document.createDocumentFragment();
+        const fragment = document.createDocumentFragment();
+        if (!allowed.has(node.tagName)) {
+          [...node.childNodes].forEach(child => fragment.appendChild(copySafeNode(child)));
+          return fragment;
+        }
+        const clean = document.createElement(node.tagName.toLowerCase());
+        if (node.tagName === 'IMG') {
+          const src = node.getAttribute('src') || '';
+          if (!/^https:\/\//i.test(src) && !/^data:image\/(png|jpe?g|gif|webp);base64,/i.test(src)) return fragment;
+          clean.setAttribute('src', src);
+          clean.setAttribute('alt', node.getAttribute('alt') || '공지 이미지');
+          clean.setAttribute('loading', 'lazy');
+          return clean;
+        }
+        [...node.childNodes].forEach(child => clean.appendChild(copySafeNode(child)));
+        return clean;
+      };
+      [...source.childNodes].forEach(node => output.appendChild(copySafeNode(node)));
+      return output.innerHTML;
+    }
+
+    function noticeContentToHtml(content) {
+      const value = String(content || '');
+      const hasRichMarkup = /<(div|p|br|img|b|strong|i|em|u|ul|ol|li)\b/i.test(value);
+      return sanitizeNoticeHtml(hasRichMarkup ? value : escapeHtml(value).replace(/\r?\n/g, '<br>'));
+    }
+
+    const currentCalendarDate = new Date();
+    const state = {
+      categories: [],
+      items: [],
+      trashItems: [],
+      notices: [],
+      schedules: [],
+      selectedScheduleId: null,
+      selectedScheduleDate: '',
+      calendarYear: currentCalendarDate.getFullYear(),
+      calendarMonth: currentCalendarDate.getMonth(),
+      archivePage: 1,
+      archivePageSize: 10,
+      selectedCategoryId: 'all',
+      selectedItemId: null,
+      selectedNoticeId: null,
+      noticeListType: null,
+      search: '',
+      page: 1,
+      pageSize: 6,
+      backend: 'local',
+      scheduleBackend: 'local'
+    };
+    let pendingImageData = '';
+    let pendingNoticeImageData = '';
+    let pendingNoticeImagePath = '';
+    let editingNoticeId = null;
+    let supabaseClient = null;
+    let supabaseSdkPromise = null;
+    let syncQueue = Promise.resolve();
+
+    function applyTheme(theme) {
+      const nextTheme = theme === 'dark' ? 'dark' : 'light';
+      document.documentElement.dataset.theme = nextTheme;
+      $('themeLabel').textContent = nextTheme === 'dark' ? '라이트' : '다크';
+      $('themeToggleBtn').setAttribute('aria-pressed', String(nextTheme === 'dark'));
+    }
+
+    function toggleTheme() {
+      const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      localStorage.setItem(THEME_STORAGE, nextTheme);
+      applyTheme(nextTheme);
+    }
+
+    function seedData() {
+      const categories = [
+        { id: 'cat_apply', name: '원서접수' },
+        { id: 'cat_exam', name: '시험 안내' },
+        { id: 'cat_score', name: '성적 발표' },
+        { id: 'cat_common', name: '공통 안내' }
+      ];
+      const createdAt = nowISO();
+      const items = [
+        { id: makeId('faq'), categoryId: 'cat_apply', question: '원서접수 기간은 언제인가요?', answer: '접수 일정은 공지사항에서 확인할 수 있습니다. 마감일에는 접속이 몰릴 수 있으니 미리 접수해 주세요.', author: 'RSDC 운영팀', createdAt, updatedAt: createdAt, comments: [] },
+        { id: makeId('faq'), categoryId: 'cat_exam', question: '시험 장소는 어디에서 확인하나요?', answer: '접수 완료 후 마이페이지의 시험 정보에서 시험 장소와 입실 시간을 확인할 수 있습니다.', author: 'RSDC 운영팀', createdAt, updatedAt: createdAt, comments: [] },
+        { id: makeId('faq'), categoryId: 'cat_score', question: '성적표를 출력할 수 있나요?', answer: '성적 발표 이후 마이페이지에서 성적표 조회 및 인쇄가 가능합니다.', author: 'RSDC 운영팀', createdAt, updatedAt: createdAt, comments: [] }
+      ];
+      localStorage.setItem(CATEGORY_STORAGE, JSON.stringify(categories));
+      localStorage.setItem(STORAGE, JSON.stringify(items));
+    }
+
+    function normalizeItem(item) {
+      const revisionHistory = Array.isArray(item.revisionHistory) ? [...item.revisionHistory] : [];
+      if (!revisionHistory.length && item.createdAt) revisionHistory.push({ at: item.createdAt });
+      if (item.updatedAt && item.updatedAt !== item.createdAt && !revisionHistory.some(entry => entry.at === item.updatedAt)) {
+        revisionHistory.push({ at: item.updatedAt });
+      }
+      return { ...item, comments: item.comments || [], imageData: item.imageData || '', imagePath: item.imagePath || '', revisionHistory };
+    }
+
+    function loadLocalData() {
+      if (!localStorage.getItem(STORAGE) || !localStorage.getItem(CATEGORY_STORAGE)) seedData();
+      state.categories = JSON.parse(localStorage.getItem(CATEGORY_STORAGE) || '[]');
+      state.items = JSON.parse(localStorage.getItem(STORAGE) || '[]').map(normalizeItem);
+      state.trashItems = JSON.parse(localStorage.getItem(TRASH_STORAGE) || '[]');
+      state.notices = JSON.parse(localStorage.getItem(NOTICE_STORAGE) || '[]');
+      state.schedules = JSON.parse(localStorage.getItem(SCHEDULE_STORAGE) || '[]');
+      seedSchedulesIfEmpty();
+    }
+
+    function persistLocalData() {
+      localStorage.setItem(CATEGORY_STORAGE, JSON.stringify(state.categories));
+      localStorage.setItem(STORAGE, JSON.stringify(state.items));
+      localStorage.setItem(TRASH_STORAGE, JSON.stringify(state.trashItems));
+      localStorage.setItem(NOTICE_STORAGE, JSON.stringify(state.notices));
+      localStorage.setItem(SCHEDULE_STORAGE, JSON.stringify(state.schedules));
+    }
+
+    function getSupabaseConfig() {
+      return window.RSDC_SUPABASE_CONFIG || null;
+    }
+
+    function hasUsableSupabaseConfig(config = getSupabaseConfig()) {
+      return Boolean(config?.url && config?.key)
+        && !String(config.url).includes('xxxxxxxx')
+        && !String(config.key).includes('...');
+    }
+
+    function loadSupabaseSdk() {
+      if (window.supabase?.createClient) return Promise.resolve(true);
+      if (!hasUsableSupabaseConfig()) return Promise.resolve(false);
+      if (supabaseSdkPromise) return supabaseSdkPromise;
+      supabaseSdkPromise = new Promise(resolve => {
+        const script = document.createElement('script');
+        const timeout = window.setTimeout(() => resolve(false), 3500);
+        script.src = SUPABASE_SDK_URL;
+        script.async = true;
+        script.onload = () => { window.clearTimeout(timeout); resolve(Boolean(window.supabase?.createClient)); };
+        script.onerror = () => { window.clearTimeout(timeout); resolve(false); };
+        document.head.appendChild(script);
+      });
+      return supabaseSdkPromise;
+    }
+
+    function configureSupabaseClient(config = getSupabaseConfig()) {
+      if (!hasUsableSupabaseConfig(config) || !window.supabase?.createClient) {
+        supabaseClient = null;
+        state.backend = 'local';
+        return false;
+      }
+      supabaseClient = window.supabase.createClient(config.url, config.key, { auth: { persistSession: false } });
+      return true;
+    }
+
+    function rowToItem(row) {
+      return normalizeItem({
+        id: row.id,
+        categoryId: row.category_id || '',
+        question: row.question,
+        answer: row.answer,
+        author: row.author,
+        imageData: row.image_url || '',
+        imagePath: row.image_path || '',
+        comments: row.comments || [],
+        revisionHistory: row.revision_history || [],
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+      });
+    }
+
+    function itemToRow(item, deleted = false) {
+      return {
+        id: item.id,
+        category_id: item.categoryId || null,
+        question: item.question,
+        answer: item.answer,
+        author: item.author,
+        image_url: item.imageData || null,
+        image_path: item.imagePath || null,
+        comments: item.comments || [],
+        revision_history: item.revisionHistory || [],
+        created_at: item.createdAt,
+        updated_at: item.updatedAt,
+        is_deleted: deleted,
+        deleted_at: deleted ? item.deletedAt : null,
+        deleted_category: deleted ? item.deletedCategory : null,
+        trash_id: deleted ? item.trashId : null
+      };
+    }
+
+    async function loadRemoteData(preserveLocalIfEmpty = false) {
+      const [{ data: categories, error: categoryError }, { data: rows, error: itemError }, { data: notices, error: noticeError }] = await Promise.all([
+        supabaseClient.from('rsdc_faq_categories').select('*').order('created_at'),
+        supabaseClient.from('rsdc_faq_items').select('*').order('updated_at', { ascending: false }),
+        supabaseClient.from('rsdc_faq_notices').select('*').order('created_at', { ascending: false })
+      ]);
+      if (categoryError) throw categoryError;
+      if (itemError) throw itemError;
+      if (noticeError) throw noticeError;
+      if (preserveLocalIfEmpty && !(categories || []).length && !(rows || []).length && !(notices || []).length && (state.categories.length || state.items.length || state.trashItems.length || state.notices.length)) {
+        state.backend = 'supabase';
+        updateSupabaseStatus('Supabase 연결됨 · DB가 비어 있습니다. 로컬 데이터 업로드 버튼을 눌러 주세요.', 'connected');
+        return false;
+      }
+      state.categories = (categories || []).map(row => ({ id: row.id, name: row.name }));
+      state.items = (rows || []).filter(row => !row.is_deleted).map(rowToItem);
+      state.trashItems = (rows || []).filter(row => row.is_deleted).map(row => ({
+        ...rowToItem(row),
+        trashId: row.trash_id || makeId('trash'),
+        deletedAt: row.deleted_at,
+        deletedCategory: row.deleted_category
+      }));
+      state.notices = (notices || []).map(row => ({ id: row.id, type: row.notice_type, title: row.title, content: row.content, author: row.author, imageData: row.image_url || '', imagePath: row.image_path || '', comments: Array.isArray(row.comments) ? row.comments : [], createdAt: row.created_at, updatedAt: row.updated_at }));
+      state.backend = 'supabase';
+      try { await loadRemoteSchedules(); }
+      catch (scheduleError) { state.scheduleBackend = 'local'; updateSupabaseStatus(`일정 테이블 연결 실패: ${scheduleError.message || scheduleError}`, 'error'); }
+      persistLocalData();
+      return true;
+    }
+
+    async function loadData() {
+      const sdkReady = await loadSupabaseSdk();
+      if (!sdkReady || !configureSupabaseClient()) return false;
+      try {
+        const loaded = await loadRemoteData(true);
+        renderAll();
+        return loaded;
+      } catch (error) {
+        state.backend = 'local';
+        updateSupabaseStatus(`연결 실패: ${error.message || error}`, 'error');
+        return false;
+      }
+    }
+
+    async function syncRemoteSnapshot() {
+      if (!supabaseClient || state.backend !== 'supabase') return;
+      const categoryRows = state.categories.map(category => ({ id: category.id, name: category.name }));
+      if (categoryRows.length) {
+        const { error } = await supabaseClient.from('rsdc_faq_categories').upsert(categoryRows, { onConflict: 'id' });
+        if (error) throw error;
+      }
+      const { data: remoteCategories, error: readCategoryError } = await supabaseClient.from('rsdc_faq_categories').select('id');
+      if (readCategoryError) throw readCategoryError;
+      for (const remoteCategory of remoteCategories || []) {
+        if (!state.categories.some(category => category.id === remoteCategory.id)) {
+          const { error } = await supabaseClient.from('rsdc_faq_categories').delete().eq('id', remoteCategory.id);
+          if (error) throw error;
+        }
+      }
+      const itemRows = [
+        ...state.items.map(item => itemToRow(item, false)),
+        ...state.trashItems.map(item => itemToRow(item, true))
+      ];
+      if (itemRows.length) {
+        const { error } = await supabaseClient.from('rsdc_faq_items').upsert(itemRows, { onConflict: 'id' });
+        if (error) throw error;
+      }
+      const noticeRows = state.notices.map(notice => ({ id: notice.id, notice_type: notice.type, title: notice.title, content: notice.content, author: notice.author, image_url: notice.imageData || null, image_path: notice.imagePath || null, comments: notice.comments || [], created_at: notice.createdAt, updated_at: notice.updatedAt }));
+      if (noticeRows.length) {
+        const { error } = await supabaseClient.from('rsdc_faq_notices').upsert(noticeRows, { onConflict: 'id' });
+        if (error) throw error;
+      }
+      const { data: remoteNotices, error: readNoticeError } = await supabaseClient.from('rsdc_faq_notices').select('id');
+      if (readNoticeError) throw readNoticeError;
+      for (const remoteNotice of remoteNotices || []) {
+        if (!state.notices.some(notice => notice.id === remoteNotice.id)) {
+          const { error } = await supabaseClient.from('rsdc_faq_notices').delete().eq('id', remoteNotice.id);
+          if (error) throw error;
+        }
+      }
+      try { await syncRemoteSchedules(); }
+      catch (scheduleError) { updateSupabaseStatus(`일정 동기화 실패: ${scheduleError.message || scheduleError}`, 'error'); }
+      updateSupabaseStatus('Supabase 연결됨 · 데이터 동기화 완료', 'connected');
+    }
+
+    function saveData(throwOnError = false) {
+      persistLocalData();
+      if (state.backend !== 'supabase') return Promise.resolve();
+      syncQueue = syncQueue.catch(() => {}).then(syncRemoteSnapshot);
+      return syncQueue.catch(error => {
+        updateSupabaseStatus(`동기화 실패: ${error.message || error}`, 'error');
+        if (throwOnError) throw error;
+      });
+    }
+
+    function categoryName(id) { return state.categories.find(category => category.id === id)?.name || '미분류'; }
+    function selectedItem() { return state.items.find(item => item.id === state.selectedItemId) || null; }
+    function selectedNotice() { return state.notices.find(notice => notice.id === state.selectedNoticeId) || null; }
+
+    const SEARCH_STOP_WORDS = new Set(['언제', '어디', '어떻게', '무엇', '뭐', '가능', '가능해', '가능한가요', '되나요', '되나요', '되죠', '인가요', '질문', '문의', '알려줘', '알려주세요']);
+    const SEARCH_ENDINGS = ['으로부터', '에서부터', '에게서는', '까지는', '에서는', '으로는', '이라면', '라면', '인가요', '한가요', '할까요', '인가', '나요', '까요', '까지', '부터', '에서', '에게', '으로', '처럼', '보다', '만큼', '은', '는', '이', '가', '을', '를', '의', '에', '도', '만', '와', '과', '로', '요'];
+
+    function normalizeSearchText(value) {
+      return String(value || '').normalize('NFKC').toLowerCase().replace(/[^0-9a-z가-힣]+/g, ' ').trim();
+    }
+
+    function normalizeSearchToken(token) {
+      let result = token;
+      for (const ending of SEARCH_ENDINGS) {
+        if (result.length > ending.length + 1 && result.endsWith(ending)) {
+          result = result.slice(0, -ending.length);
+          break;
+        }
+      }
+      return result;
+    }
+
+    function searchTokens(value) {
+      return [...new Set(normalizeSearchText(value).split(/\s+/).map(normalizeSearchToken).filter(token => token.length >= 2 && !SEARCH_STOP_WORDS.has(token)))];
+    }
+
+    function fieldMatchScore(queryToken, fieldText, weight) {
+      if (!fieldText) return 0;
+      if (fieldText.includes(queryToken)) return weight;
+      const fieldTokens = searchTokens(fieldText);
+      return fieldTokens.some(token => token.includes(queryToken) || (queryToken.length >= 3 && queryToken.includes(token))) ? Math.max(1, weight - 1) : 0;
+    }
+
+    function filteredItems() {
+      const keyword = normalizeSearchText(state.search);
+      const queryTokens = searchTokens(keyword);
+      const rows = state.items
+        .filter(item => state.selectedCategoryId === 'all' || item.categoryId === state.selectedCategoryId);
+      if (!keyword) return rows.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      return rows.map(item => {
+        const question = normalizeSearchText(item.question);
+        const answer = normalizeSearchText(item.answer);
+        const author = normalizeSearchText(item.author);
+        const category = normalizeSearchText(categoryName(item.categoryId));
+        let matchedTokens = 0;
+        let score = question.includes(keyword) ? 30 : (answer.includes(keyword) ? 18 : 0);
+        queryTokens.forEach(token => {
+          const tokenScore = Math.max(
+            fieldMatchScore(token, question, 8),
+            fieldMatchScore(token, answer, 5),
+            fieldMatchScore(token, author, 3),
+            fieldMatchScore(token, category, 3)
+          );
+          if (tokenScore) matchedTokens += 1;
+          score += tokenScore;
+        });
+        return { item, score, matchedTokens };
+      })
+        .filter(result => result.score > 0 && result.matchedTokens >= Math.min(2, Math.max(1, queryTokens.length)))
+        .sort((a, b) => b.score - a.score || new Date(b.item.updatedAt) - new Date(a.item.updatedAt))
+        .map(result => result.item);
+    }
+
+    function renderFilters() {
+      const options = state.categories.map(category => `<option value="${category.id}">${escapeHtml(category.name)}</option>`).join('');
+      $('categoryFilter').innerHTML = `<option value="all">전체 카테고리</option>${options}`;
+      $('itemCategory').innerHTML = `${options}<option value="__custom__">직접입력</option>`;
+      $('categoryFilter').value = state.selectedCategoryId;
+    }
+
+    function toggleCustomCategoryInput() {
+      const active = $('itemCategory').value === '__custom__';
+      $('categoryInputRow').classList.toggle('custom-active', active);
+      $('customCategoryName').classList.toggle('hidden', !active);
+      $('confirmCustomCategoryBtn').classList.toggle('hidden', !active);
+      if (active) $('customCategoryName').focus();
+      else $('customCategoryName').value = '';
+    }
+
+    function confirmCustomCategory() {
+      const name = $('customCategoryName').value.trim();
+      if (!name) return alert('새 카테고리 이름을 입력해 주세요.');
+      let category = state.categories.find(row => row.name.toLowerCase() === name.toLowerCase());
+      if (!category) {
+        category = { id: makeId('cat'), name };
+        state.categories.push(category);
+        saveData();
+      }
+      renderAll();
+      $('itemCategory').value = category.id;
+      toggleCustomCategoryInput();
+    }
+
+    function renderCategories() {
+      const ranked = state.categories
+        .map(category => ({ ...category, count: state.items.filter(item => item.categoryId === category.id).length }))
+        .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'ko'));
+      $('modalCategoryList').innerHTML = ranked.map(row => `
+        <div class="modal-category-row">
+          <button class="category-item ${state.selectedCategoryId === row.id ? 'active' : ''}" data-modal-category="${row.id}"><span>${escapeHtml(row.name)}</span><strong>${row.count}</strong></button>
+          <button class="btn btn-danger" data-delete-category="${row.id}" aria-label="${escapeHtml(row.name)} 카테고리 삭제">삭제</button>
+        </div>`).join('');
+      document.querySelectorAll('[data-modal-category]').forEach(node => node.onclick = () => {
+        state.selectedCategoryId = node.dataset.modalCategory;
+        state.page = 1;
+        closeCategoryModal();
+        renderAll();
+      });
+      document.querySelectorAll('[data-delete-category]').forEach(node => node.onclick = () => deleteCategoryById(node.dataset.deleteCategory));
+    }
+
+    function renderIssueLists() {
+      const renderGroup = (type, elementId) => {
+        const rows = state.notices.filter(notice => notice.type === type).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+        $(elementId).innerHTML = rows.length
+          ? rows.map(notice => `
+            <button class="issue-item" data-notice-id="${notice.id}" title="${escapeHtml(notice.title)}">
+              <span class="issue-item-title">${escapeHtml(notice.title)}</span>
+              <span class="issue-item-date">${formatCompactDate(notice.createdAt)}</span>
+            </button>`).join('')
+          : '<span class="muted">등록된 이슈가 없습니다.</span>';
+      };
+      renderGroup('monthly', 'monthlyIssueList');
+      renderGroup('weekly', 'weeklyIssueList');
+      document.querySelectorAll('[data-notice-id]').forEach(button => button.onclick = () => selectNotice(button.dataset.noticeId));
+    }
+
+    function renderIssueArchive() {
+      const active = state.noticeListType === 'monthly' || state.noticeListType === 'weekly';
+      $('categoryToolbar').classList.toggle('hidden', active);
+      $('questionListPanel').classList.toggle('hidden', active);
+      $('issueArchivePanel').classList.toggle('hidden', !active);
+      if (!active) return;
+      const rows = state.notices
+        .filter(notice => notice.type === state.noticeListType)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const totalPages = Math.max(1, Math.ceil(rows.length / state.archivePageSize));
+      state.archivePage = Math.min(Math.max(1, state.archivePage), totalPages);
+      const start = (state.archivePage - 1) * state.archivePageSize;
+      const pageRows = rows.slice(start, start + state.archivePageSize);
+      $('issueArchiveTitle').textContent = state.noticeListType === 'weekly' ? 'Weekly Heads-up' : 'Must-Read';
+      const tableRows = pageRows.length
+        ? pageRows.map((notice, index) => `
+          <tr data-archive-notice="${notice.id}">
+            <td>${start + index + 1}</td>
+            <td>${escapeHtml(notice.title)}</td>
+            <td>${escapeHtml(notice.author || '-')}</td>
+            <td>${formatDate(notice.createdAt)}</td>
+          </tr>`).join('')
+        : '<tr class="empty-row"><td colspan="4">등록된 이슈사항이 없습니다.</td></tr>';
+      $('issueArchiveList').innerHTML = `
+        <div class="table-wrap issue-archive-table-wrap">
+          <table class="issue-archive-table">
+            <thead><tr><th>No.</th><th>제목</th><th>작성자</th><th>작성일시</th></tr></thead>
+            <tbody>${tableRows}</tbody>
+          </table>
+        </div>
+        <div class="pagination issue-archive-pagination" id="issueArchivePagination"></div>`;
+      document.querySelectorAll('[data-archive-notice]').forEach(row => row.onclick = () => selectNotice(row.dataset.archiveNotice));
+      renderIssueArchivePagination(totalPages, rows.length);
+    }
+
+    function renderIssueArchivePagination(totalPages, totalItems) {
+      const target = $('issueArchivePagination');
+      if (!target) return;
+      if (!totalItems || totalPages <= 1) {
+        target.innerHTML = '';
+        return;
+      }
+      const candidates = [1, totalPages, state.archivePage - 2, state.archivePage - 1, state.archivePage, state.archivePage + 1, state.archivePage + 2]
+        .filter(page => page >= 1 && page <= totalPages);
+      const pages = [...new Set(candidates)].sort((a, b) => a - b);
+      const parts = [`<button class="page-btn" data-archive-page="${state.archivePage - 1}" ${state.archivePage === 1 ? 'disabled' : ''}>이전</button>`];
+      pages.forEach((page, index) => {
+        if (index && page - pages[index - 1] > 1) parts.push('<span class="page-ellipsis">…</span>');
+        parts.push(`<button class="page-btn ${page === state.archivePage ? 'active' : ''}" data-archive-page="${page}" aria-label="${page}페이지">${page}</button>`);
+      });
+      parts.push(`<button class="page-btn" data-archive-page="${state.archivePage + 1}" ${state.archivePage === totalPages ? 'disabled' : ''}>다음</button>`);
+      target.innerHTML = parts.join('');
+      document.querySelectorAll('[data-archive-page]').forEach(button => button.onclick = () => {
+        if (button.disabled) return;
+        state.archivePage = Number(button.dataset.archivePage);
+        renderIssueArchive();
+      });
+    }
+
+    function showNoticeArchive(type) {
+      state.noticeListType = type;
+      state.archivePage = 1;
+      renderIssueArchive();
+      $('issueArchivePanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function showQuestionList(scroll = true) {
+      state.noticeListType = null;
+      renderIssueArchive();
+      if (scroll) $('categoryToolbar').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function renderSidebarActivity() {
+      const posts = [...state.items].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4);
+      $('recentPostList').innerHTML = posts.length ? posts.map(item => `<button class="mini-item" data-recent-item="${item.id}"><strong>${escapeHtml(item.question)}</strong></button>`).join('') : '<span class="muted">등록된 글이 없습니다.</span>';
+
+      const comments = [
+        ...state.items.flatMap(item => item.comments.map(comment => ({ ...comment, targetId: item.id, targetType: 'item' }))),
+        ...state.notices.flatMap(notice => (notice.comments || []).map(comment => ({ ...comment, targetId: notice.id, targetType: 'notice' })))
+      ]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
+      $('recentCommentList').innerHTML = comments.length ? comments.map(comment => `<button class="mini-item" data-comment-target="${comment.targetId}" data-comment-type="${comment.targetType}"><strong>${escapeHtml(comment.text)}</strong></button>`).join('') : '<span class="muted">등록된 댓글이 없습니다.</span>';
+
+      document.querySelectorAll('[data-recent-item]').forEach(node => node.onclick = () => {
+        selectItem(node.dataset.recentItem);
+        $('viewerPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      document.querySelectorAll('[data-comment-target]').forEach(node => node.onclick = () => {
+        if (node.dataset.commentType === 'notice') selectNotice(node.dataset.commentTarget);
+        else selectItem(node.dataset.commentTarget);
+        $('viewerPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+
+    function renderTable() {
+      const filtered = filteredItems();
+      const totalPages = Math.max(1, Math.ceil(filtered.length / state.pageSize));
+      state.page = Math.min(Math.max(1, state.page), totalPages);
+      const start = (state.page - 1) * state.pageSize;
+      const items = filtered.slice(start, start + state.pageSize);
+      $('listInfo').textContent = filtered.length ? `${filtered.length}건 · ${state.page}/${totalPages}페이지` : '0건';
+      $('itemTableBody').innerHTML = items.length ? items.map(item => `
+        <tr data-item="${item.id}" class="${item.id === state.selectedItemId ? 'active' : ''}">
+          <td>${escapeHtml(categoryName(item.categoryId))}</td>
+          <td>${escapeHtml(item.question)}</td>
+          <td>${escapeHtml(item.author || '-')}</td>
+          <td>${formatDate(item.createdAt)}</td>
+        </tr>`).join('') : '<tr><td colspan="4" class="empty">검색 결과가 없습니다.</td></tr>';
+      document.querySelectorAll('[data-item]').forEach(row => row.onclick = () => {
+        selectItem(row.dataset.item);
+        $('viewerPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      renderPagination(totalPages, filtered.length);
+    }
+
+    function renderPagination(totalPages, totalItems) {
+      if (!totalItems || totalPages <= 1) {
+        $('pagination').innerHTML = '';
+        return;
+      }
+      const candidates = [1, totalPages, state.page - 2, state.page - 1, state.page, state.page + 1, state.page + 2]
+        .filter(page => page >= 1 && page <= totalPages);
+      const pages = [...new Set(candidates)].sort((a, b) => a - b);
+      const parts = [`<button class="page-btn" data-page="${state.page - 1}" ${state.page === 1 ? 'disabled' : ''}>이전</button>`];
+      pages.forEach((page, index) => {
+        if (index && page - pages[index - 1] > 1) parts.push('<span class="page-ellipsis">…</span>');
+        parts.push(`<button class="page-btn ${page === state.page ? 'active' : ''}" data-page="${page}" aria-label="${page}페이지">${page}</button>`);
+      });
+      parts.push(`<button class="page-btn" data-page="${state.page + 1}" ${state.page === totalPages ? 'disabled' : ''}>다음</button>`);
+      $('pagination').innerHTML = parts.join('');
+      document.querySelectorAll('[data-page]').forEach(button => button.onclick = () => {
+        if (button.disabled) return;
+        state.page = Number(button.dataset.page);
+        renderTable();
+        $('itemTableBody').closest('.list-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+
+    function renderViewer() {
+      const notice = selectedNotice();
+      $('viewerPanel').classList.toggle('notice-mode', Boolean(notice));
+      if (notice) {
+        $('viewQuestionLabel').textContent = 'Notice';
+        $('viewAnswerLabel').textContent = 'Details';
+        $('viewQuestion').textContent = notice.title;
+        $('viewQuestion').classList.remove('viewer-empty');
+        $('viewAnswer').innerHTML = noticeContentToHtml(notice.content);
+        $('viewAnswer').classList.remove('viewer-empty');
+        $('viewMeta').innerHTML = `${notice.type === 'weekly' ? 'Weekly Heads-up' : 'Must-Read'}<br>작성자 ${escapeHtml(notice.author || '-')}<br>작성일시 ${formatDate(notice.createdAt)}`;
+        if (notice.imageData) {
+          $('viewAnswerImage').src = notice.imageData;
+          $('viewAnswerImage').classList.remove('hidden');
+        } else {
+          $('viewAnswerImage').classList.add('hidden');
+          $('viewAnswerImage').removeAttribute('src');
+        }
+        $('viewerActions').classList.remove('hidden');
+        $('commentArea').classList.remove('hidden');
+        renderComments(notice);
+        return;
+      }
+      const item = selectedItem();
+      $('viewQuestionLabel').textContent = 'Question';
+      $('viewAnswerLabel').textContent = 'Answer';
+      $('viewerActions').classList.remove('hidden');
+      if (!item) {
+        $('viewQuestion').textContent = '위 목록에서 질문을 선택해 주세요.';
+        $('viewQuestion').classList.add('viewer-empty');
+        $('viewAnswer').textContent = '선택한 질문의 답변이 여기에 표시됩니다.';
+        $('viewAnswer').classList.add('viewer-empty');
+        $('viewMeta').innerHTML = '작성자 -<br>작성일시 -<br>최종 수정일시 -';
+        $('viewAnswerImage').classList.add('hidden');
+        $('viewAnswerImage').removeAttribute('src');
+        $('commentList').innerHTML = '<div class="muted">질문을 선택하면 댓글이 표시됩니다.</div>';
+        $('commentArea').classList.remove('hidden');
+        return;
+      }
+      $('viewQuestion').textContent = item.question;
+      $('viewQuestion').classList.remove('viewer-empty');
+      $('viewAnswer').textContent = item.answer;
+      $('viewAnswer').classList.remove('viewer-empty');
+      const finalModifiedAt = item.revisionHistory?.[item.revisionHistory.length - 1]?.at || item.updatedAt || item.createdAt;
+      $('viewMeta').innerHTML = `작성자 ${escapeHtml(item.author || '-')}<br>작성일시 ${formatDate(item.createdAt)}<br>최종 수정일시 ${formatDate(finalModifiedAt)}`;
+      if (item.imageData) {
+        $('viewAnswerImage').src = item.imageData;
+        $('viewAnswerImage').classList.remove('hidden');
+      } else {
+        $('viewAnswerImage').classList.add('hidden');
+        $('viewAnswerImage').removeAttribute('src');
+      }
+      $('commentArea').classList.remove('hidden');
+      renderComments(item);
+    }
+
+    function renderComments(item) {
+      const comments = item.comments || [];
+      $('commentList').innerHTML = comments.length ? comments.map(comment => `
+        <div class="comment-item">
+          <div class="comment-meta"><strong>${escapeHtml(comment.author)}</strong><span>${formatDate(comment.createdAt)}</span></div>
+          <div>${escapeHtml(comment.text)}</div>
+        </div>`).join('') : '<div class="muted">등록된 댓글이 없습니다.</div>';
+    }
+
+    function showEditorMode(focusFirst = false) {
+      $('contentPanel').classList.add('hidden');
+      $('editorPanel').classList.remove('hidden');
+      $('addFaqBtn').textContent = '목록';
+      $('addFaqBtn').classList.add('is-list-mode');
+      if (focusFirst) setTimeout(() => $('editorName').focus(), 0);
+    }
+
+    function showBrowseMode(scroll = false) {
+      $('editorPanel').classList.add('hidden');
+      $('contentPanel').classList.remove('hidden');
+      $('addFaqBtn').textContent = 'FAQ추가';
+      $('addFaqBtn').classList.remove('is-list-mode');
+      if (scroll) $('contentPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+
+    function todayKey() {
+      const now = new Date();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const date = String(now.getDate()).padStart(2, '0');
+      return `${now.getFullYear()}-${month}-${date}`;
+    }
+
+    function formatScheduleDate(dateKey = todayKey()) {
+      return new Date(`${dateKey}T00:00:00`).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+    }
+
+    function seedSchedulesIfEmpty() {
+      if (state.schedules.length) return;
+      const date = todayKey();
+      state.schedules = [
+        { id: makeId('schedule'), date, time: '10:00', content: '입시상담 설명회', createdAt: nowISO(), updatedAt: nowISO() },
+        { id: makeId('schedule'), date, time: '13:00', content: '(직장인) 설명회, 연사 원장님', createdAt: nowISO(), updatedAt: nowISO() }
+      ];
+      localStorage.setItem(SCHEDULE_STORAGE, JSON.stringify(state.schedules));
+    }
+
+    function scheduleToRow(schedule) {
+      return {
+        id: schedule.id,
+        schedule_date: schedule.date,
+        schedule_time: schedule.time,
+        content: schedule.content,
+        created_at: schedule.createdAt,
+        updated_at: schedule.updatedAt
+      };
+    }
+
+    function rowToSchedule(row) {
+      return {
+        id: row.id,
+        date: row.schedule_date,
+        time: String(row.schedule_time || '').slice(0, 5),
+        content: row.content || '',
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+      };
+    }
+
+    async function loadRemoteSchedules() {
+      if (!supabaseClient) return false;
+      const { data, error } = await supabaseClient.from('rsdc_faq_schedules').select('*').order('schedule_date').order('schedule_time');
+      if (error) throw error;
+      if ((data || []).length) {
+        state.schedules = data.map(rowToSchedule);
+        persistLocalData();
+      }
+      state.scheduleBackend = 'supabase';
+      return true;
+    }
+
+    async function syncRemoteSchedules() {
+      if (!supabaseClient || state.backend !== 'supabase' || state.scheduleBackend !== 'supabase') return;
+      const rows = state.schedules.map(scheduleToRow);
+      if (rows.length) {
+        const { error } = await supabaseClient.from('rsdc_faq_schedules').upsert(rows, { onConflict: 'id' });
+        if (error) throw error;
+      }
+      const { data: remoteRows, error: readError } = await supabaseClient.from('rsdc_faq_schedules').select('id');
+      if (readError) throw readError;
+      for (const remoteRow of remoteRows || []) {
+        if (!state.schedules.some(schedule => schedule.id === remoteRow.id)) {
+          const { error } = await supabaseClient.from('rsdc_faq_schedules').delete().eq('id', remoteRow.id);
+          if (error) throw error;
+        }
+      }
+    }
+
+    async function saveSchedules() {
+      persistLocalData();
+      try {
+        await syncRemoteSchedules();
+      } catch (error) {
+        updateSupabaseStatus(`일정 동기화 실패: ${error.message || error}`, 'error');
+      }
+    }
+
+    function dateKeyFromParts(year, month, day) {
+      return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+
+    function changeCalendarMonth(delta) {
+      const next = new Date(state.calendarYear, state.calendarMonth + delta, 1);
+      state.calendarYear = next.getFullYear();
+      state.calendarMonth = next.getMonth();
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const now = new Date();
+      const year = state.calendarYear;
+      const month = state.calendarMonth;
+      const today = todayKey();
+      const firstDay = new Date(year, month, 1).getDay();
+      const lastDate = new Date(year, month + 1, 0).getDate();
+      if ($('calendarMonthLabel')) {
+        $('calendarMonthLabel').textContent = new Date(year, month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      }
+      if (!$('calendarGrid')) return;
+      const cells = [];
+      for (let i = 0; i < firstDay; i += 1) cells.push('<span class="mini-calendar-day empty"></span>');
+      for (let day = 1; day <= lastDate; day += 1) {
+        const dateKey = dateKeyFromParts(year, month, day);
+        cells.push(`<span class="mini-calendar-day ${dateKey === today ? 'today' : ''}" role="button" tabindex="0" data-calendar-date="${dateKey}" aria-label="${dateKey} 일정 보기">${day}</span>`);
+      }
+      $('calendarGrid').innerHTML = cells.join('');
+    }
+
+    function renderSchedules(date = state.selectedScheduleDate || todayKey()) {
+      state.selectedScheduleDate = date;
+      const rows = state.schedules.filter(schedule => schedule.date === date).sort((a, b) => a.time.localeCompare(b.time));
+      if ($('scheduleModalTitle')) $('scheduleModalTitle').textContent = date === todayKey() ? '오늘 주요 일정' : '주요 일정';
+      if ($('scheduleModalDate')) $('scheduleModalDate').textContent = formatScheduleDate(date);
+      $('scheduleList').innerHTML = rows.length ? rows.map(schedule => `
+        <div class="schedule-row" data-schedule-id="${schedule.id}">
+          <span class="schedule-time">${escapeHtml(schedule.time)}</span>
+          <span class="schedule-content">${escapeHtml(schedule.content)}</span>
+          <span class="schedule-actions">
+            <button class="schedule-icon-btn" type="button" data-edit-schedule="${schedule.id}" aria-label="일정 수정">✎</button>
+            <button class="schedule-icon-btn delete" type="button" data-delete-schedule="${schedule.id}" aria-label="일정 삭제">×</button>
+          </span>
+        </div>`).join('') : '<div class="schedule-empty">등록된 주요 일정이 없습니다.</div>';
+      document.querySelectorAll('[data-edit-schedule]').forEach(button => button.onclick = () => editSchedule(button.dataset.editSchedule));
+      document.querySelectorAll('[data-delete-schedule]').forEach(button => button.onclick = () => deleteSchedule(button.dataset.deleteSchedule));
+    }
+
+    function openScheduleModal(date = todayKey()) {
+      renderSchedules(date);
+      $('scheduleModal').classList.remove('hidden');
+      $('scheduleModalBackdrop').classList.remove('hidden');
+      setTimeout(() => $('scheduleTimeInput').focus(), 0);
+    }
+
+    function closeScheduleModal() {
+      state.selectedScheduleId = null;
+      state.selectedScheduleDate = '';
+      $('scheduleTimeInput').value = '';
+      $('scheduleContentInput').value = '';
+      $('addScheduleBtn').textContent = '추가';
+      $('scheduleModal').classList.add('hidden');
+      $('scheduleModalBackdrop').classList.add('hidden');
+    }
+
+    function upsertSchedule() {
+      const time = $('scheduleTimeInput').value;
+      const content = $('scheduleContentInput').value.trim();
+      if (!time || !content) return alert('시간과 주요내용을 입력해 주세요.');
+      const now = nowISO();
+      const existing = state.selectedScheduleId ? state.schedules.find(schedule => schedule.id === state.selectedScheduleId) : null;
+      if (existing) {
+        Object.assign(existing, { time, content, updatedAt: now });
+      } else {
+        state.schedules.push({ id: makeId('schedule'), date: state.selectedScheduleDate || todayKey(), time, content, createdAt: now, updatedAt: now });
+      }
+      state.selectedScheduleId = null;
+      $('scheduleTimeInput').value = '';
+      $('scheduleContentInput').value = '';
+      $('addScheduleBtn').textContent = '추가';
+      saveSchedules();
+      renderSchedules();
+    }
+
+    function editSchedule(id) {
+      const schedule = state.schedules.find(row => row.id === id);
+      if (!schedule) return;
+      state.selectedScheduleId = id;
+      $('scheduleTimeInput').value = schedule.time;
+      $('scheduleContentInput').value = schedule.content;
+      $('addScheduleBtn').textContent = '수정';
+      $('scheduleContentInput').focus();
+    }
+
+    function deleteSchedule(id) {
+      const schedule = state.schedules.find(row => row.id === id);
+      if (!schedule) return;
+      if (!confirm(`'${schedule.time} ${schedule.content}' 일정을 삭제하시겠습니까?`)) return;
+      state.schedules = state.schedules.filter(row => row.id !== id);
+      if (state.selectedScheduleId === id) state.selectedScheduleId = null;
+      saveSchedules();
+      renderSchedules();
+    }
+
+    function renderAll() { renderFilters(); renderCategories(); renderIssueLists(); renderIssueArchive(); renderSidebarActivity(); renderTable(); renderViewer(); renderRevisionHistory(selectedItem()); renderCalendar(); }
+
+    function updateAttachmentPreview() {
+      if (pendingImageData) {
+        $('attachmentPreviewImage').src = pendingImageData;
+        $('attachmentPreview').classList.remove('hidden');
+      } else {
+        $('attachmentPreview').classList.add('hidden');
+        $('attachmentPreviewImage').removeAttribute('src');
+      }
+    }
+
+    function renderRevisionHistory(item) {
+      const history = item?.revisionHistory || [];
+      if (!history.length) {
+        $('revisionHistoryList').innerHTML = '<span class="muted">질문을 선택하면 수정 이력이 표시됩니다.</span>';
+        return;
+      }
+      $('revisionHistoryList').innerHTML = history.map((entry, index) => {
+        const label = index === 0 ? '최초 작성일자' : `수정 ${index}차`;
+        const isFinal = index === history.length - 1;
+        return `<div class="revision-row"><strong>${label}</strong><span>${formatDate(entry.at)}</span>${isFinal ? '<em class="revision-final">최종</em>' : '<span></span>'}</div>`;
+      }).join('');
+    }
+
+    function clearForm() {
+      state.selectedItemId = null;
+      state.selectedNoticeId = null;
+      $('editorTitle').textContent = 'Add FAQ';
+      $('editorName').value = '';
+      $('itemQuestion').value = '';
+      $('itemAnswer').value = '';
+      $('answerImageInput').value = '';
+      pendingImageData = '';
+      updateAttachmentPreview();
+      if (state.categories[0]) $('itemCategory').value = state.categories[0].id;
+      toggleCustomCategoryInput();
+      $('editorStatus').textContent = '새 질문을 등록할 수 있습니다.';
+      renderRevisionHistory(null);
+      renderTable();
+      renderViewer();
+    }
+
+    function selectItem(id) {
+      if (state.noticeListType) showQuestionList(false);
+      state.selectedNoticeId = null;
+      state.selectedItemId = id;
+      const item = selectedItem();
+      if (!item) return;
+      $('editorTitle').textContent = 'Add FAQ';
+      $('itemCategory').value = item.categoryId;
+      toggleCustomCategoryInput();
+      $('editorName').value = item.author || '';
+      $('itemQuestion').value = item.question;
+      $('itemAnswer').value = item.answer;
+      $('answerImageInput').value = '';
+      pendingImageData = item.imageData || '';
+      updateAttachmentPreview();
+      const latestRevision = item.revisionHistory?.[item.revisionHistory.length - 1]?.at || item.updatedAt;
+      $('editorStatus').textContent = `최근 수정: ${formatDate(latestRevision)}`;
+      renderRevisionHistory(item);
+      renderTable();
+      renderViewer();
+    }
+
+    function selectNotice(id) {
+      state.selectedItemId = null;
+      state.selectedNoticeId = id;
+      renderIssueLists();
+      renderTable();
+      renderViewer();
+      renderRevisionHistory(null);
+      $('viewerPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function openNoticeModal(type = 'monthly', notice = null) {
+      editingNoticeId = notice?.id || null;
+      $('noticeModalTitle').textContent = notice ? 'Edit Notice' : 'Add Notice';
+      $('noticeType').value = notice?.type || type;
+      $('noticeAuthor').value = notice?.author || '';
+      $('noticeTitle').value = notice?.title || '';
+      $('noticeContent').innerHTML = noticeContentToHtml(notice?.content || '');
+      $('noticeImageInput').value = '';
+      pendingNoticeImageData = notice?.imageData || '';
+      pendingNoticeImagePath = notice?.imagePath || '';
+      updateNoticeAttachmentPreview();
+      $('noticeModal').classList.remove('hidden');
+      $('noticeModalBackdrop').classList.remove('hidden');
+      setTimeout(() => $('noticeTitle').focus(), 0);
+    }
+
+    function closeNoticeModal() {
+      editingNoticeId = null;
+      pendingNoticeImageData = '';
+      pendingNoticeImagePath = '';
+      $('noticeModal').classList.add('hidden');
+      $('noticeModalBackdrop').classList.add('hidden');
+    }
+
+    async function saveNotice() {
+      const type = $('noticeType').value;
+      const author = $('noticeAuthor').value.trim();
+      const title = $('noticeTitle').value.trim();
+      let content = sanitizeNoticeHtml($('noticeContent').innerHTML).trim();
+      const hasBody = $('noticeContent').textContent.trim() || /<img\b/i.test(content);
+      if (!author || !title || !hasBody) return alert('작성자, 제목, 내용을 모두 입력해 주세요.');
+      const now = nowISO();
+      const existing = editingNoticeId ? state.notices.find(row => row.id === editingNoticeId) : null;
+      const previous = existing ? { ...existing } : null;
+      const notice = existing || { id: makeId('notice'), comments: [], createdAt: now };
+      $('saveNoticeBtn').disabled = true;
+      try {
+        content = await uploadInlineNoticeImages(notice.id, content);
+        let imageData = pendingNoticeImageData;
+        let imagePath = pendingNoticeImagePath;
+        if (imageData?.startsWith('data:image/') && state.backend === 'supabase') {
+          const uploaded = await uploadImageToSupabase(notice.id, imageData);
+          imageData = uploaded.imageUrl;
+          imagePath = uploaded.imagePath;
+        }
+        Object.assign(notice, { type, title, content, author, imageData, imagePath, updatedAt: now });
+        if (!existing) state.notices.unshift(notice);
+        await saveData(true);
+        closeNoticeModal();
+        renderAll();
+        selectNotice(notice.id);
+      } catch (error) {
+        if (previous) Object.assign(notice, previous);
+        else state.notices = state.notices.filter(row => row.id !== notice.id);
+        updateSupabaseStatus(`공지 저장 실패: ${error.message || error}`, 'error');
+        alert(`공지 저장에 실패했습니다: ${error.message || error}`);
+      } finally {
+        $('saveNoticeBtn').disabled = false;
+      }
+    }
+
+    function updateNoticeAttachmentPreview() {
+      if (pendingNoticeImageData) {
+        $('noticeAttachmentPreviewImage').src = pendingNoticeImageData;
+        $('noticeAttachmentPreview').classList.remove('hidden');
+      } else {
+        $('noticeAttachmentPreview').classList.add('hidden');
+        $('noticeAttachmentPreviewImage').removeAttribute('src');
+      }
+    }
+
+    function attachNoticeImageFile(file) {
+      if (!file || !file.type.startsWith('image/')) return alert('이미지 파일만 첨부할 수 있습니다.');
+      if (file.size > 3 * 1024 * 1024) return alert('이미지는 3MB 이하로 첨부해 주세요.');
+      const reader = new FileReader();
+      reader.onload = () => {
+        pendingNoticeImageData = String(reader.result || '');
+        pendingNoticeImagePath = '';
+        updateNoticeAttachmentPreview();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function pasteInlineNoticeImage(file, savedRange) {
+      if (!file || !file.type.startsWith('image/')) return alert('이미지 파일만 붙여넣을 수 있습니다.');
+      if (file.size > 3 * 1024 * 1024) return alert('이미지는 3MB 이하로 붙여넣어 주세요.');
+      const reader = new FileReader();
+      reader.onload = () => {
+        const editor = $('noticeContent');
+        const image = document.createElement('img');
+        image.src = String(reader.result || '');
+        image.alt = '공지 이미지';
+        const range = savedRange && editor.contains(savedRange.commonAncestorContainer) ? savedRange : null;
+        if (range) {
+          range.deleteContents();
+          range.insertNode(image);
+          range.setStartAfter(image);
+          range.collapse(true);
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+        } else {
+          editor.appendChild(image);
+        }
+        editor.focus();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function uploadInlineNoticeImages(noticeId, html) {
+      const container = document.createElement('div');
+      container.innerHTML = sanitizeNoticeHtml(html);
+      const images = [...container.querySelectorAll('img[src^="data:image/"]')];
+      if (state.backend === 'supabase') {
+        for (const image of images) {
+          const uploaded = await uploadImageToSupabase(noticeId, image.getAttribute('src'));
+          image.setAttribute('src', uploaded.imageUrl);
+        }
+      }
+      return sanitizeNoticeHtml(container.innerHTML);
+    }
+
+    function editSelectedContent() {
+      const notice = selectedNotice();
+      if (notice) return openNoticeModal(notice.type, notice);
+      if (!selectedItem()) return alert('수정할 질문이나 공지를 선택해 주세요.');
+      showEditorMode(true);
+    }
+
+    async function deleteNotice() {
+      const notice = selectedNotice();
+      if (!notice) return;
+      if (!confirm(`'${notice.title}' 공지사항을 삭제하시겠습니까?`)) return;
+      const index = state.notices.findIndex(row => row.id === notice.id);
+      state.notices.splice(index, 1);
+      state.selectedNoticeId = null;
+      try {
+        await saveData(true);
+        renderAll();
+      } catch (error) {
+        state.notices.splice(index, 0, notice);
+        state.selectedNoticeId = notice.id;
+        persistLocalData();
+        renderAll();
+        alert(`공지 삭제에 실패했습니다: ${error.message || error}`);
+      }
+    }
+
+    function deleteSelectedContent() {
+      if (selectedNotice()) return deleteNotice();
+      deleteItem();
+    }
+
+    async function uploadImageToSupabase(itemId, dataUrl) {
+      if (!supabaseClient || state.backend !== 'supabase' || !dataUrl?.startsWith('data:image/')) return { imageUrl: dataUrl || '', imagePath: '' };
+      const blob = await fetch(dataUrl).then(response => response.blob());
+      const extension = (blob.type.split('/')[1] || 'png').replace('jpeg', 'jpg');
+      const imagePath = `${itemId}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${extension}`;
+      const { error } = await supabaseClient.storage.from('faq-images').upload(imagePath, blob, { contentType: blob.type, upsert: false });
+      if (error) throw error;
+      const { data } = supabaseClient.storage.from('faq-images').getPublicUrl(imagePath);
+      return { imageUrl: data.publicUrl, imagePath };
+    }
+
+    async function saveItem() {
+      const categoryId = $('itemCategory').value;
+      const author = $('editorName').value.trim();
+      const question = $('itemQuestion').value.trim();
+      const answer = $('itemAnswer').value.trim();
+      if (categoryId === '__custom__') return alert('직접 입력한 카테고리를 먼저 추가해 주세요.');
+      if (!categoryId || !author || !question || !answer) return alert('카테고리, 작성자, 질문, 답변을 모두 입력해 주세요.');
+      const now = nowISO();
+      const itemId = state.selectedItemId || makeId('faq');
+      $('saveItemBtn').disabled = true;
+      $('saveItemBtn').textContent = '저장 중...';
+      try {
+        let imageData = pendingImageData;
+        let imagePath = selectedItem()?.imagePath || '';
+        if (pendingImageData?.startsWith('data:image/') && state.backend === 'supabase') {
+          const uploaded = await uploadImageToSupabase(itemId, pendingImageData);
+          imageData = uploaded.imageUrl;
+          imagePath = uploaded.imagePath;
+        }
+        if (state.selectedItemId) {
+          const item = selectedItem();
+          item.revisionHistory = [...(item.revisionHistory || [{ at: item.createdAt }]), { at: now }];
+          Object.assign(item, { categoryId, author, question, answer, imageData, imagePath, updatedAt: now });
+        } else {
+          const item = { id: itemId, categoryId, author, question, answer, imageData, imagePath, createdAt: now, updatedAt: now, comments: [], revisionHistory: [{ at: now }] };
+          state.items.unshift(item);
+          state.selectedItemId = item.id;
+        }
+        await saveData(true);
+        clearForm();
+        renderAll();
+        alert('저장되었습니다.');
+      } catch (error) {
+        updateSupabaseStatus(`저장 실패: ${error.message || error}`, 'error');
+        alert(`저장에 실패했습니다: ${error.message || error}`);
+      } finally {
+        $('saveItemBtn').disabled = false;
+        $('saveItemBtn').textContent = '저장';
+      }
+    }
+
+    function moveItemToTrash(item, category) {
+      state.trashItems.unshift({
+        ...item,
+        trashId: makeId('trash'),
+        deletedAt: nowISO(),
+        deletedCategory: category ? { id: category.id, name: category.name } : null
+      });
+    }
+
+    function renderTrash() {
+      const rows = [...state.trashItems].sort((a, b) => new Date(b.deletedAt) - new Date(a.deletedAt));
+      $('trashList').innerHTML = rows.length ? rows.map(item => `
+        <div class="trash-item">
+          <div>
+            <strong>${escapeHtml(item.question)}</strong>
+            <span>${escapeHtml(item.deletedCategory?.name || '미분류')} · 삭제 ${formatDate(item.deletedAt)}</span>
+          </div>
+          <button class="btn btn-primary" data-restore-trash="${item.trashId}">복구</button>
+        </div>`).join('') : '<div class="empty">휴지통이 비어 있습니다.</div>';
+      document.querySelectorAll('[data-restore-trash]').forEach(node => node.onclick = () => restoreTrashItem(node.dataset.restoreTrash));
+    }
+
+    function restoreTrashItem(trashId) {
+      const entry = state.trashItems.find(item => item.trashId === trashId);
+      if (!entry) return;
+      let category = entry.deletedCategory
+        ? state.categories.find(row => row.id === entry.deletedCategory.id) || state.categories.find(row => row.name === entry.deletedCategory.name)
+        : null;
+      if (!category && entry.deletedCategory) {
+        category = { ...entry.deletedCategory };
+        state.categories.push(category);
+      }
+      const { trashId: removedTrashId, deletedAt, deletedCategory, ...restoredItem } = entry;
+      restoredItem.categoryId = category?.id || '';
+      if (state.items.some(item => item.id === restoredItem.id)) restoredItem.id = makeId('faq');
+      state.items.unshift(restoredItem);
+      state.trashItems = state.trashItems.filter(item => item.trashId !== removedTrashId);
+      saveData();
+      renderAll();
+      renderTrash();
+    }
+
+    function openSettingsModal() {
+      renderTrash();
+      $('settingsModal').classList.remove('hidden');
+      $('settingsModalBackdrop').classList.remove('hidden');
+    }
+
+    function closeSettingsModal() {
+      $('settingsModal').classList.add('hidden');
+      $('settingsModalBackdrop').classList.add('hidden');
+    }
+
+    /* ── 초기화 기능 ── */
+    function openResetPwModal() {
+      $('resetPwInput').value = '';
+      $('resetPwError').style.display = 'none';
+      $('resetPwModal').classList.remove('hidden');
+      $('resetPwBackdrop').classList.remove('hidden');
+      setTimeout(() => $('resetPwInput').focus(), 80);
+    }
+    function closeResetPwModal() {
+      $('resetPwModal').classList.add('hidden');
+      $('resetPwBackdrop').classList.add('hidden');
+    }
+    function openResetSelectModal() {
+      ['resetChkFaq','resetChkMustRead','resetChkWeekly','resetChkCalendar','resetChkAll'].forEach(id => { $(id).checked = false; });
+      $('resetSelectModal').classList.remove('hidden');
+      $('resetSelectBackdrop').classList.remove('hidden');
+    }
+    function closeResetSelectModal() {
+      $('resetSelectModal').classList.add('hidden');
+      $('resetSelectBackdrop').classList.add('hidden');
+    }
+    async function executeReset() {
+      const doFaq      = $('resetChkFaq').checked;
+      const doMustRead = $('resetChkMustRead').checked;
+      const doWeekly   = $('resetChkWeekly').checked;
+      const doCalendar = $('resetChkCalendar').checked;
+      if (!doFaq && !doMustRead && !doWeekly && !doCalendar) { alert('초기화할 항목을 하나 이상 선택해 주세요.'); return; }
+      if (!confirm('정말로 초기화 하시겠습니까?')) return;
+
+      if (doFaq) {
+        state.items = [];
+        state.trashItems = [];
+        state.categories = [];
+        localStorage.removeItem(STORAGE);
+        localStorage.removeItem(CATEGORY_STORAGE);
+        localStorage.removeItem(TRASH_STORAGE);
+        if (supabaseClient && state.backend === 'supabase') {
+          try {
+            await supabaseClient.from('rsdc_faq_items').delete().neq('id', '__placeholder__');
+            await supabaseClient.from('rsdc_faq_categories').delete().neq('id', '__placeholder__');
+          } catch(e) {}
+        }
+      }
+      if (doMustRead || doWeekly) {
+        if (doMustRead && doWeekly) {
+          state.notices = [];
+          localStorage.removeItem(NOTICE_STORAGE);
+          if (supabaseClient && state.backend === 'supabase') {
+            try { await supabaseClient.from('rsdc_faq_notices').delete().neq('id', '__placeholder__'); } catch(e) {}
+          }
+        } else {
+          const type = doMustRead ? 'monthly' : 'weekly';
+          state.notices = state.notices.filter(n => n.type !== type);
+          localStorage.setItem(NOTICE_STORAGE, JSON.stringify(state.notices));
+          if (supabaseClient && state.backend === 'supabase') {
+            try { await supabaseClient.from('rsdc_faq_notices').delete().eq('type', type); } catch(e) {}
+          }
+        }
+      }
+      if (doCalendar) {
+        state.schedules = [];
+        localStorage.removeItem(SCHEDULE_STORAGE);
+        if (supabaseClient && state.backend === 'supabase') {
+          try { await supabaseClient.from('rsdc_faq_schedules').delete().neq('id', '__placeholder__'); } catch(e) {}
+        }
+      }
+      closeResetSelectModal();
+      closeSettingsModal();
+      renderAll();
+      alert('초기화가 완료되었습니다.');
+    }
+
+    $('openResetPanelBtn').onclick = openResetPwModal;
+    $('closeResetPwBtn').onclick = closeResetPwModal;
+    $('cancelResetPwBtn').onclick = closeResetPwModal;
+    $('resetPwBackdrop').onclick = closeResetPwModal;
+    $('confirmResetPwBtn').onclick = () => {
+      if ($('resetPwInput').value === '1010') {
+        closeResetPwModal();
+        openResetSelectModal();
+      } else {
+        $('resetPwError').style.display = 'block';
+        $('resetPwInput').select();
+      }
+    };
+    $('resetPwInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('confirmResetPwBtn').click(); });
+    $('closeResetSelectBtn').onclick = closeResetSelectModal;
+    $('cancelResetSelectBtn').onclick = closeResetSelectModal;
+    $('resetSelectBackdrop').onclick = closeResetSelectModal;
+    $('resetChkAll').addEventListener('change', e => {
+      ['resetChkFaq','resetChkMustRead','resetChkWeekly','resetChkCalendar'].forEach(id => { $(id).checked = e.target.checked; });
+    });
+    ['resetChkFaq','resetChkMustRead','resetChkWeekly','resetChkCalendar'].forEach(id => {
+      $(id).addEventListener('change', () => {
+        $('resetChkAll').checked = ['resetChkFaq','resetChkMustRead','resetChkWeekly','resetChkCalendar'].every(i => $(i).checked);
+      });
+    });
+    $('confirmResetSelectBtn').onclick = executeReset;
+
+    function updateSupabaseStatus(message, type = '') {
+      if (!$('supabaseStatus')) return;
+      $('supabaseStatus').textContent = message;
+      $('supabaseStatus').classList.toggle('connected', type === 'connected');
+      $('supabaseStatus').classList.toggle('error', type === 'error');
+    }
+
+    function deleteItem() {
+      const item = selectedItem();
+      if (!item) return alert('삭제할 질문을 먼저 선택해 주세요.');
+      if (!confirm(`'${item.question}' 질문을 삭제하시겠습니까?`)) return;
+      moveItemToTrash(item, state.categories.find(category => category.id === item.categoryId));
+      state.items = state.items.filter(row => row.id !== item.id);
+      saveData();
+      clearForm();
+      renderAll();
+    }
+
+    function addComment() {
+      const item = selectedNotice() || selectedItem();
+      if (!item) return alert('댓글을 남길 질문이나 공지를 먼저 선택해 주세요.');
+      const author = $('commentAuthor').value.trim();
+      const text = $('commentText').value.trim();
+      if (!author || !text) return alert('댓글 작성자와 내용을 입력해 주세요.');
+      if (!Array.isArray(item.comments)) item.comments = [];
+      item.comments.push({ id: makeId('comment'), author, text, createdAt: nowISO() });
+      saveData();
+      $('commentText').value = '';
+      renderComments(item);
+      renderSidebarActivity();
+    }
+
+    function addCategory() {
+      const name = prompt('새 카테고리 이름을 입력하세요.');
+      if (!name?.trim()) return;
+      state.categories.push({ id: makeId('cat'), name: name.trim() });
+      saveData();
+      renderAll();
+    }
+
+    function editCategory() {
+      if (state.selectedCategoryId === 'all') return alert('수정할 카테고리를 선택해 주세요.');
+      const category = state.categories.find(row => row.id === state.selectedCategoryId);
+      const name = prompt('카테고리 이름을 수정하세요.', category?.name || '');
+      if (!category || !name?.trim()) return;
+      category.name = name.trim();
+      saveData();
+      renderAll();
+    }
+
+    function deleteCategoryById(categoryId) {
+      const category = state.categories.find(row => row.id === categoryId);
+      if (!category) return;
+      if (!confirm('해당 카테고리를 삭제하실 경우 모든 질문/답변이 삭제됩니다 진행하시겠습니까?')) return;
+      const selectedItemWasDeleted = selectedItem()?.categoryId === categoryId;
+      state.items.filter(item => item.categoryId === categoryId).forEach(item => moveItemToTrash(item, category));
+      state.items = state.items.filter(item => item.categoryId !== categoryId);
+      state.categories = state.categories.filter(row => row.id !== categoryId);
+      if (state.selectedCategoryId === categoryId) state.selectedCategoryId = 'all';
+      saveData();
+      if (selectedItemWasDeleted) clearForm();
+      renderAll();
+      openCategoryModal();
+    }
+
+    function openCategoryModal() {
+      $('categoryModal').classList.remove('hidden');
+      $('categoryModalBackdrop').classList.remove('hidden');
+    }
+
+    function closeCategoryModal() {
+      $('categoryModal').classList.add('hidden');
+      $('categoryModalBackdrop').classList.add('hidden');
+    }
+
+    function openActivityModal(type) {
+      const isPost = type === 'posts';
+      $('activityModalTitle').textContent = isPost ? '최근 추가된 글' : '최신 댓글';
+      if (isPost) {
+        const posts = [...state.items].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        $('activityModalList').innerHTML = posts.length ? posts.map(item => `
+          <button class="activity-detail-item" data-activity-item="${item.id}">
+            <strong>${escapeHtml(item.question)}</strong>
+            <span>${escapeHtml(categoryName(item.categoryId))} · ${formatDate(item.createdAt)}</span>
+            <p>${escapeHtml(item.answer)}</p>
+          </button>`).join('') : '<div class="empty">등록된 글이 없습니다.</div>';
+      } else {
+        const comments = [
+          ...state.items.flatMap(item => item.comments.map(comment => ({ ...comment, targetId: item.id, targetType: 'item', targetTitle: item.question }))),
+          ...state.notices.flatMap(notice => (notice.comments || []).map(comment => ({ ...comment, targetId: notice.id, targetType: 'notice', targetTitle: notice.title })))
+        ]
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        $('activityModalList').innerHTML = comments.length ? comments.map(comment => `
+          <button class="activity-detail-item" data-activity-target="${comment.targetId}" data-activity-type="${comment.targetType}">
+            <strong>${escapeHtml(comment.text)}</strong>
+            <span>${formatDate(comment.createdAt)}</span>
+            <p>연결된 ${comment.targetType === 'notice' ? '공지' : '질문'}: ${escapeHtml(comment.targetTitle)}</p>
+          </button>`).join('') : '<div class="empty">등록된 댓글이 없습니다.</div>';
+      }
+      document.querySelectorAll('[data-activity-item], [data-activity-target]').forEach(node => node.onclick = () => {
+        closeActivityModal();
+        if (node.dataset.activityType === 'notice') selectNotice(node.dataset.activityTarget);
+        else selectItem(node.dataset.activityItem || node.dataset.activityTarget);
+        $('viewerPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      $('activityModal').classList.remove('hidden');
+      $('activityModalBackdrop').classList.remove('hidden');
+    }
+
+    function closeActivityModal() {
+      $('activityModal').classList.add('hidden');
+      $('activityModalBackdrop').classList.add('hidden');
+    }
+
+    function toggleEditorSize(forceClose = false) {
+      const expanded = forceClose ? false : !$('editorPanel').classList.contains('expanded');
+      $('editorPanel').classList.toggle('expanded', expanded);
+      $('editorBackdrop').classList.toggle('hidden', !expanded);
+      $('expandEditorBtn').textContent = expanded ? '작게 보기' : '크게 보기';
+      if (expanded) $('editorPanel').scrollTop = 0;
+    }
+
+    async function resetToInitialView() {
+      if (state.backend === 'supabase') {
+        try { await loadRemoteData(true); }
+        catch (error) { updateSupabaseStatus(`새로고침 실패: ${error.message || error}`, 'error'); }
+      }
+      state.search = '';
+      state.selectedCategoryId = 'all';
+      state.noticeListType = null;
+      state.page = 1;
+      $('searchInput').value = '';
+      closeCategoryModal();
+      closeActivityModal();
+      closeSettingsModal();
+      closeNoticeModal();
+      closeScheduleModal();
+      if ($('editorPanel').classList.contains('expanded')) toggleEditorSize(true);
+      clearForm();
+      renderAll();
+      showBrowseMode();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function attachImageFile(file) {
+      if (!file || !file.type.startsWith('image/')) return alert('이미지 파일만 첨부할 수 있습니다.');
+      if (file.size > 3 * 1024 * 1024) return alert('이미지는 3MB 이하로 첨부해 주세요.');
+      const reader = new FileReader();
+      reader.onload = () => { pendingImageData = String(reader.result || ''); updateAttachmentPreview(); };
+      reader.readAsDataURL(file);
+    }
+
+    $('searchInput').addEventListener('input', event => { state.search = event.target.value; state.page = 1; renderTable(); });
+    $('categoryFilter').addEventListener('change', event => { state.selectedCategoryId = event.target.value; state.page = 1; renderAll(); });
+    $('resetFilterBtn').onclick = () => { state.search = ''; state.selectedCategoryId = 'all'; state.page = 1; $('searchInput').value = ''; renderAll(); };
+    $('themeToggleBtn').onclick = toggleTheme;
+    $('settingsBtn').onclick = openSettingsModal;
+    $('calendarCardBtn').addEventListener('click', event => {
+      const nav = event.target.closest('[data-calendar-nav]');
+      if (nav) {
+        event.stopPropagation();
+        changeCalendarMonth(Number(nav.dataset.calendarNav));
+        return;
+      }
+      const day = event.target.closest('[data-calendar-date]');
+      if (day) {
+        event.stopPropagation();
+        openScheduleModal(day.dataset.calendarDate);
+        return;
+      }
+      openScheduleModal(todayKey());
+    });
+    $('closeScheduleModalBtn').onclick = closeScheduleModal;
+    $('scheduleModalBackdrop').onclick = closeScheduleModal;
+    $('addScheduleBtn').onclick = upsertSchedule;
+    $('scheduleList').addEventListener('click', event => {
+      const editButton = event.target.closest('[data-edit-schedule]');
+      if (editButton) return editSchedule(editButton.dataset.editSchedule);
+      const deleteButton = event.target.closest('[data-delete-schedule]');
+      if (deleteButton) return deleteSchedule(deleteButton.dataset.deleteSchedule);
+    });
+    $('scheduleContentInput').addEventListener('keydown', event => { if (event.key === 'Enter') upsertSchedule(); });
+    $('newItemBtn').onclick = resetToInitialView;
+    $('clearFormBtn').onclick = () => { clearForm(); showBrowseMode(true); };
+    $('addFaqBtn').onclick = () => {
+      if (!$('editorPanel').classList.contains('hidden')) {
+        clearForm();
+        showBrowseMode(true);
+        return;
+      }
+      clearForm();
+      showEditorMode(true);
+    };
+    $('saveItemBtn').onclick = saveItem;
+    $('itemCategory').addEventListener('change', toggleCustomCategoryInput);
+    $('confirmCustomCategoryBtn').onclick = confirmCustomCategory;
+    $('customCategoryName').addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        confirmCustomCategory();
+      }
+    });
+    $('answerImageInput').addEventListener('change', event => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      attachImageFile(file);
+    });
+    $('itemAnswer').addEventListener('paste', event => {
+      const imageItem = [...(event.clipboardData?.items || [])].find(item => item.type.startsWith('image/'));
+      if (!imageItem) return;
+      event.preventDefault();
+      attachImageFile(imageItem.getAsFile());
+    });
+    $('removeImageBtn').onclick = () => { pendingImageData = ''; $('answerImageInput').value = ''; updateAttachmentPreview(); };
+    $('expandEditorBtn').onclick = () => toggleEditorSize();
+    $('editorBackdrop').onclick = () => toggleEditorSize(true);
+    $('viewerEditBtn').onclick = editSelectedContent;
+    $('viewerDeleteBtn').onclick = deleteSelectedContent;
+    $('addCommentBtn').onclick = addComment;
+    $('commentText').addEventListener('keydown', event => { if (event.key === 'Enter') addComment(); });
+    $('addCategoryBtn').onclick = addCategory;
+    $('editCategoryBtn').onclick = editCategory;
+    $('showAllBtn').onclick = openCategoryModal;
+    document.querySelectorAll('[data-add-notice]').forEach(button => button.onclick = () => openNoticeModal(button.dataset.addNotice));
+    document.querySelectorAll('[data-show-notice-list]').forEach(button => button.onclick = () => showNoticeArchive(button.dataset.showNoticeList));
+    $('backToQuestionListBtn').onclick = () => showQuestionList();
+    $('saveNoticeBtn').onclick = saveNotice;
+    $('closeNoticeModalBtn').onclick = closeNoticeModal;
+    $('noticeModalBackdrop').onclick = closeNoticeModal;
+    $('noticeImageInput').addEventListener('change', event => {
+      const file = event.target.files?.[0];
+      if (file) attachNoticeImageFile(file);
+    });
+    $('noticeContent').addEventListener('paste', event => {
+      const imageItem = [...(event.clipboardData?.items || [])].find(item => item.type.startsWith('image/'));
+      if (!imageItem) return;
+      const selection = window.getSelection();
+      const savedRange = selection.rangeCount ? selection.getRangeAt(0).cloneRange() : null;
+      event.preventDefault();
+      pasteInlineNoticeImage(imageItem.getAsFile(), savedRange);
+    });
+    $('removeNoticeImageBtn').onclick = () => {
+      pendingNoticeImageData = '';
+      pendingNoticeImagePath = '';
+      $('noticeImageInput').value = '';
+      updateNoticeAttachmentPreview();
+    };
+    $('closeCategoryModalBtn').onclick = closeCategoryModal;
+    $('categoryModalBackdrop').onclick = closeCategoryModal;
+    $('recentPostMoreBtn').onclick = () => openActivityModal('posts');
+    $('recentCommentMoreBtn').onclick = () => openActivityModal('comments');
+    $('closeActivityModalBtn').onclick = closeActivityModal;
+    $('activityModalBackdrop').onclick = closeActivityModal;
+    $('closeSettingsModalBtn').onclick = closeSettingsModal;
+    $('settingsModalBackdrop').onclick = closeSettingsModal;
+
+    async function init() {
+      applyTheme(localStorage.getItem(THEME_STORAGE) || 'light');
+      loadLocalData();
+      renderAll();
+      loadData();
+    }
+    init();
+  </script>
+</body>
+</html>
+

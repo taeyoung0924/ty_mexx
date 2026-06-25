@@ -672,6 +672,9 @@
     .gnb-search input::placeholder { color: #8b92a1; }
     .gnb-faq-mobile { display: none; }
     .gnb-actions { display: flex; justify-content: flex-end; gap: 8px; min-width: 0; }
+    .gnb-actions .settings-button .btn-text,
+    .gnb-actions .theme-toggle .btn-text { display: none; }
+    .gnb-actions .btn-icon { font-size: 14pt; line-height: 1; filter: grayscale(1); }
     .gnb .btn {
       min-height: 28px;
       padding: 4px 11px;
@@ -892,9 +895,17 @@
       .gnb-faq-desktop { display: none; }
       .gnb-faq-mobile { display: inline-flex; white-space: nowrap; }
       .gnb-actions .btn-text { display: none; }
-      .gnb-actions .btn-icon { font-size: 14pt; line-height: 1; }
+      .gnb-actions .btn-icon { font-size: 16pt; line-height: 1; filter: grayscale(1); }
       .gnb-actions .settings-button,
-      .gnb-actions .theme-toggle { min-width: 34px; padding: 4px 8px; }
+      .gnb-actions .theme-toggle {
+        min-width: 30px;
+        padding: 4px 6px;
+        background: transparent;
+        border-color: transparent;
+        box-shadow: none;
+      }
+      .gnb-actions .settings-button:hover,
+      .gnb-actions .theme-toggle:hover { background: rgba(255,255,255,.10); border-color: transparent; }
       .sidebar, .content, .editor { grid-column: 1; grid-row: auto; }
       .content { grid-template-rows: auto auto; }
     }

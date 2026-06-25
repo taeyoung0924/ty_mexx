@@ -912,6 +912,20 @@
       .calendar-card.search-collapsed .mini-calendar-grid { display: none; }
       .calendar-card.search-collapsed { padding-bottom: 10px; }
       .calendar-card.search-collapsed .mini-calendar-head { margin-bottom: 0; }
+      .calendar-collapse-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 4px 0;
+        color: var(--sub);
+        background: transparent;
+        border: none;
+        font-size: 9pt;
+        cursor: pointer;
+        opacity: .55;
+      }
+      .calendar-collapse-toggle:hover { opacity: 1; color: var(--primary); }
     }
 
     @media (max-width: 640px) {
@@ -1476,6 +1490,9 @@
           <span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span>
         </div>
         <div class="mini-calendar-grid" id="calendarGrid"></div>
+      </button>
+      <button class="calendar-collapse-toggle hidden" id="calendarToggleBtn" type="button" aria-label="달력 펼치기/접기">
+        <span id="calendarToggleIcon">▲</span>
       </button>
       <div class="notice-title">
         <h2>Notice</h2>
@@ -3250,11 +3267,18 @@
       state.page = 1;
       renderTable();
       if (window.innerWidth <= 760) {
-        $('calendarCardBtn').classList.toggle('search-collapsed', event.target.value.length > 0);
+        const hasText = event.target.value.length > 0;
+        $('calendarCardBtn').classList.toggle('search-collapsed', hasText);
+        $('calendarToggleBtn').classList.toggle('hidden', !hasText);
+        $('calendarToggleIcon').textContent = hasText ? '▼' : '▲';
       }
     });
     $('categoryFilter').addEventListener('change', event => { state.selectedCategoryId = event.target.value; state.page = 1; renderAll(); });
-    $('resetFilterBtn').onclick = () => { state.search = ''; state.selectedCategoryId = 'all'; state.page = 1; $('searchInput').value = ''; $('calendarCardBtn').classList.remove('search-collapsed'); renderAll(); };
+    $('resetFilterBtn').onclick = () => { state.search = ''; state.selectedCategoryId = 'all'; state.page = 1; $('searchInput').value = ''; $('calendarCardBtn').classList.remove('search-collapsed'); $('calendarToggleBtn').classList.add('hidden'); renderAll(); };
+    $('calendarToggleBtn').onclick = () => {
+      const collapsed = $('calendarCardBtn').classList.toggle('search-collapsed');
+      $('calendarToggleIcon').textContent = collapsed ? '▼' : '▲';
+    };
     $('themeToggleBtn').onclick = toggleTheme;
     $('settingsBtn').onclick = openSettingsModal;
     $('calendarCardBtn').addEventListener('click', event => {

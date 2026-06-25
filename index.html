@@ -1462,7 +1462,56 @@
       border-color: rgba(226, 232, 240, .32);
     }
 
-  </style>
+  
+
+    /* Calendar overflow fix v2: avoid global .empty padding affecting blank calendar cells */
+    .calendar-card {
+      overflow: hidden;
+    }
+
+    .calendar-card .mini-calendar-weekdays,
+    .calendar-card .mini-calendar-grid {
+      grid-template-columns: repeat(7, 28px);
+      column-gap: 4px;
+      justify-content: center;
+      justify-items: center;
+      width: 100%;
+      max-width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .calendar-card .mini-calendar-day {
+      box-sizing: border-box;
+      width: 28px;
+      min-width: 28px;
+      height: 28px;
+      padding: 0 !important;
+      margin: 0;
+    }
+
+    .calendar-card .mini-calendar-day.empty {
+      padding: 0 !important;
+      width: 28px;
+      min-width: 28px;
+      height: 28px;
+      visibility: hidden;
+    }
+
+    @media (max-width: 360px) {
+      .calendar-card .mini-calendar-weekdays,
+      .calendar-card .mini-calendar-grid {
+        grid-template-columns: repeat(7, 26px);
+        column-gap: 2px;
+      }
+      .calendar-card .mini-calendar-day,
+      .calendar-card .mini-calendar-day.empty {
+        width: 26px;
+        min-width: 26px;
+        height: 26px;
+      }
+    }
+</style>
 </head>
 <body>
     <div class="app">

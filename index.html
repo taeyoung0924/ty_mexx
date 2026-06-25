@@ -1345,9 +1345,9 @@
       box-shadow: none;
     }
     :root[data-theme="dark"] .questions-return-btn {
-      color: #d7deea;
-      background: rgba(226, 232, 240, .12);
-      border-color: rgba(226, 232, 240, .16);
+      color: #ffffff;
+      background: rgba(226, 232, 240, .18);
+      border-color: rgba(226, 232, 240, .28);
     }
 
 
@@ -1484,14 +1484,14 @@
       <section class="panel issue-archive hidden" id="issueArchivePanel">
         <div class="list-title">
           <strong id="issueArchiveTitle">이슈사항 전체 목록</strong>
-          <button class="btn btn-secondary questions-return-btn" id="backToQuestionListBtn" type="button">Questions</button>
+          <button class="btn btn-secondary questions-return-btn" id="backToQuestionListBtn" type="button">질문목록</button>
         </div>
         <div class="issue-archive-list" id="issueArchiveList"></div>
       </section>
 
       <section class="panel list-panel" id="questionListPanel">
         <div class="list-title">
-          <strong>Questions</strong>
+          <strong>질문목록</strong>
           <span class="muted" id="listInfo"></span>
         </div>
         <div class="table-wrap">
@@ -2653,7 +2653,13 @@
     function selectNotice(id) {
       state.selectedItemId = null;
       state.selectedNoticeId = id;
+      const notice = state.notices.find(n => n.id === id);
+      if (notice && state.noticeListType !== notice.type) {
+        state.noticeListType = notice.type;
+        state.archivePage = 1;
+      }
       renderIssueLists();
+      renderIssueArchive();
       renderTable();
       renderViewer();
       renderRevisionHistory(null);

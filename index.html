@@ -657,7 +657,9 @@
     .gnb-brand img { width: 118px; max-height: 24px; object-fit: contain; }
     .gnb-brand span { width: 1px; height: 22px; background: rgba(255,255,255,.58); }
     .gnb-brand strong { color: #fff; font-size: 14pt; font-weight: 700; white-space: nowrap; }
+    .gnb-search { display: flex; align-items: center; gap: 8px; }
     .gnb-search input {
+      flex: 1;
       height: 36px;
       padding: 0 14px;
       color: #202633;
@@ -668,6 +670,7 @@
       font-size: 10.5pt;
     }
     .gnb-search input::placeholder { color: #8b92a1; }
+    .gnb-faq-mobile { display: none; }
     .gnb-actions { display: flex; justify-content: flex-end; gap: 8px; min-width: 0; }
     .gnb .btn {
       min-height: 28px;
@@ -877,11 +880,21 @@
         gap: 16px;
       }
       .gnb {
-        grid-template-columns: 1fr;
-        gap: 10px;
+        grid-template-columns: 1fr auto;
+        grid-template-rows: auto auto;
+        gap: 8px 10px;
         padding: 10px 14px;
       }
-      .gnb-actions { justify-content: flex-start; overflow: auto; }
+      .gnb-brand { grid-column: 1; grid-row: 1; }
+      .gnb-actions { grid-column: 2; grid-row: 1; justify-content: flex-end; gap: 6px; }
+      .gnb-search { grid-column: 1 / -1; grid-row: 2; }
+      .gnb-search input { flex: 1; min-width: 0; }
+      .gnb-faq-desktop { display: none; }
+      .gnb-faq-mobile { display: inline-flex; white-space: nowrap; }
+      .gnb-actions .btn-text { display: none; }
+      .gnb-actions .btn-icon { font-size: 14pt; line-height: 1; }
+      .gnb-actions .settings-button,
+      .gnb-actions .theme-toggle { min-width: 34px; padding: 4px 8px; }
       .sidebar, .content, .editor { grid-column: 1; grid-row: auto; }
       .content { grid-template-rows: auto auto; }
     }
@@ -1426,11 +1439,14 @@
     <div class="app">
     <header class="gnb">
       <button class="gnb-brand" id="homeBrandBtn" type="button" aria-label="첫 화면으로 이동"><img src="./mexx_white.png" alt="MEXX"><span></span><strong>Team Playbook</strong></button>
-      <div class="gnb-search"><input type="text" id="searchInput" placeholder="질문 또는 답변 검색"></div>
+      <div class="gnb-search">
+        <input type="text" id="searchInput" placeholder="질문 또는 답변 검색">
+        <button class="btn btn-primary gnb-faq-mobile" id="addFaqBtnMobile" type="button">FAQ추가</button>
+      </div>
       <div class="gnb-actions">
-        <button class="btn btn-primary" id="addFaqBtn" type="button">FAQ추가</button>
-        <button class="btn btn-secondary settings-button" id="settingsBtn" type="button" aria-label="설정 열기">설정</button>
-        <button class="btn btn-secondary theme-toggle" id="themeToggleBtn" type="button" aria-label="화면 테마 변경"><span id="themeLabel">다크</span></button>
+        <button class="btn btn-primary gnb-faq-desktop" id="addFaqBtn" type="button">FAQ추가</button>
+        <button class="btn btn-secondary settings-button" id="settingsBtn" type="button" aria-label="설정 열기"><span class="btn-icon">⚙︎</span><span class="btn-text">설정</span></button>
+        <button class="btn btn-secondary theme-toggle" id="themeToggleBtn" type="button" aria-label="화면 테마 변경"><span class="btn-icon" id="themeIcon">🌙</span><span class="btn-text" id="themeLabel">다크</span></button>
       </div>
     </header>
 
@@ -1814,6 +1830,7 @@
       const nextTheme = theme === 'dark' ? 'dark' : 'light';
       document.documentElement.dataset.theme = nextTheme;
       $('themeLabel').textContent = nextTheme === 'dark' ? '라이트' : '다크';
+      $('themeIcon').textContent = nextTheme === 'dark' ? '☀︎' : '🌙';
       $('themeToggleBtn').setAttribute('aria-pressed', String(nextTheme === 'dark'));
     }
 
@@ -3253,6 +3270,7 @@
       clearForm();
       showEditorMode(true);
     };
+    $('addFaqBtnMobile').onclick = () => $('addFaqBtn').click();
     $('saveItemBtn').onclick = saveItem;
     $('itemCategory').addEventListener('change', toggleCustomCategoryInput);
     $('confirmCustomCategoryBtn').onclick = confirmCustomCategory;

@@ -563,6 +563,7 @@
       .viewer-meta { white-space: normal; }
       .viewer-meta .meta-author, .viewer-meta .meta-modified { display: block; }
       .viewer-meta .meta-created { display: none !important; }
+      .col-date { display: none; }
       .comments { margin-left: 0; }
     }
 
@@ -1506,7 +1507,7 @@
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>카테고리</th><th>질문</th><th>작성자</th><th>작성일시</th></tr></thead>
+            <thead><tr><th>카테고리</th><th>질문</th><th>작성자</th><th class="col-date">작성일시</th></tr></thead>
             <tbody id="itemTableBody"></tbody>
           </table>
         </div>
@@ -2287,7 +2288,7 @@
           <td>${escapeHtml(categoryName(item.categoryId))}</td>
           <td>${escapeHtml(item.question)}</td>
           <td>${escapeHtml(item.author || '-')}</td>
-          <td>${formatDate(item.createdAt)}</td>
+          <td class="col-date">${formatDate(item.createdAt)}</td>
         </tr>`).join('') : '<tr><td colspan="4" class="empty">검색 결과가 없습니다.</td></tr>';
       document.querySelectorAll('[data-item]').forEach(row => row.onclick = () => {
         selectItem(row.dataset.item);

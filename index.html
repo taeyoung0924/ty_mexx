@@ -1364,6 +1364,29 @@
       border-color: rgba(255, 255, 255, .18);
     }
 
+
+    /* FAQ editor sizing and inline answer images */
+    #itemQuestion {
+      min-height: 58px;
+      height: 58px;
+      resize: vertical;
+    }
+    #itemAnswer.faq-answer-editor {
+      min-height: 238px;
+      height: 238px;
+      line-height: 1.65;
+      resize: vertical;
+    }
+    #itemAnswer.faq-answer-editor img {
+      display: block;
+      max-width: min(100%, 640px);
+      max-height: 420px;
+      margin: 10px 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      object-fit: contain;
+    }
+
   </style>
 </head>
 <body>
@@ -1503,8 +1526,8 @@
           </div>
         </div>
         <div class="field"><label for="editorName">작성자</label><input type="text" id="editorName" placeholder="이름"></div>
-        <div class="field"><label for="itemQuestion">질문</label><textarea id="itemQuestion" placeholder="질문을 입력하세요"></textarea></div>
-        <div class="field"><label for="itemAnswer">답변</label><textarea id="itemAnswer" placeholder="답변을 입력하세요"></textarea><span class="muted">답변 입력창에 이미지를 붙여넣으면 자동으로 첨부됩니다.</span></div>
+        <div class="field"><label for="itemQuestion">질문</label><textarea id="itemQuestion" rows="2" placeholder="질문을 입력하세요"></textarea></div>
+        <div class="field"><label for="itemAnswer">답변</label><div class="rich-editor faq-answer-editor" id="itemAnswer" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="답변을 입력하세요"></div><span class="muted">답변 입력창에 이미지를 붙여넣으면 커서 위치에 이미지가 들어갑니다.</span></div>
         <div class="field">
           <label for="answerImageInput">답변 이미지 첨부</label>
           <input type="file" id="answerImageInput" accept="image/*">
@@ -1711,6 +1734,16 @@
       const value = String(content || '');
       const hasRichMarkup = /<(div|p|br|img|b|strong|i|em|u|ul|ol|li)\b/i.test(value);
       return sanitizeNoticeHtml(hasRichMarkup ? value : escapeHtml(value).replace(/\r?\n/g, '<br>'));
+    }
+
+    function answerContentToHtml(content) {
+      return noticeContentToHtml(content);
+    }
+
+    function htmlToPlainText(content) {
+      const container = document.createElement('div');
+      container.innerHTML = noticeContentToHtml(content);
+      return container.textContent || '';
     }
 
     const currentCalendarDate = new Date();
@@ -1976,7 +2009,7 @@
     const SEARCH_ENDINGS = ['으로부터', '에서부터', '에게서는', '까지는', '에서는', '으로는', '이라면', '라면', '인가요', '한가요', '할까요', '인가', '나요', '까요', '까지', '부터', '에서', '에게', '으로', '처럼', '보다', '만큼', '은', '는', '이', '가', '을', '를', '의', '에', '도', '만', '와', '과', '로', '요'];
 
     function normalizeSearchText(value) {
-      return String(value || '').normalize('NFKC').toLowerCase().replace(/[^0-9a-z가-힣]+/g, ' ').trim();
+      return htmlToPlainText(value).normalize('NFKC').toLowerCase().replace(/[^0-9a-z가-힣]+/g, ' ').trim();
     }
 
     function normalizeSearchToken(token) {
@@ -2288,7 +2321,7 @@
       }
       $('viewQuestion').textContent = item.question;
       $('viewQuestion').classList.remove('viewer-empty');
-      $('viewAnswer').textContent = item.answer;
+      $('viewAnswer').innerHTML = answerContentToHtml(item.answer);
       $('viewAnswer').classList.remove('viewer-empty');
       const finalModifiedAt = item.revisionHistory?.[item.revisionHistory.length - 1]?.at || item.updatedAt || item.createdAt;
       $('viewMeta').innerHTML = `작성자 ${escapeHtml(item.author || '-')}<br>작성일시 ${formatDate(item.createdAt)}<br>최종 수정일시 ${formatDate(finalModifiedAt)}`;
@@ -2546,7 +2579,7 @@
       $('editorTitle').textContent = 'Add FAQ';
       $('editorName').value = '';
       $('itemQuestion').value = '';
-      $('itemAnswer').value = '';
+      $('itemAnswer').innerHTML = '';
       $('answerImageInput').value = '';
       pendingImageData = '';
       updateAttachmentPreview();
@@ -2569,7 +2602,7 @@
       toggleCustomCategoryInput();
       $('editorName').value = item.author || '';
       $('itemQuestion').value = item.question;
-      $('itemAnswer').value = item.answer;
+      $('itemAnswer').innerHTML = answerContentToHtml(item.answer);
       $('answerImageInput').value = '';
       pendingImageData = item.imageData || '';
       updateAttachmentPreview();
@@ -2673,6 +2706,35 @@
       reader.readAsDataURL(file);
     }
 
+
+    function pasteInlineAnswerImage(file, savedRange) {
+      if (!file || !file.type.startsWith('image/')) return alert('이미지 파일만 붙여넣을 수 있습니다.');
+      if (file.size > 3 * 1024 * 1024) return alert('이미지는 3MB 이하로 붙여넣어 주세요.');
+      const reader = new FileReader();
+      reader.onload = () => {
+        const editor = $('itemAnswer');
+        const image = document.createElement('img');
+        image.src = String(reader.result || '');
+        image.alt = '답변 이미지';
+        const range = savedRange && editor.contains(savedRange.commonAncestorContainer) ? savedRange : null;
+        editor.focus();
+        if (range) {
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+          range.deleteContents();
+          range.insertNode(image);
+          range.setStartAfter(image);
+          range.setEndAfter(image);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        } else {
+          editor.appendChild(image);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
     function pasteInlineNoticeImage(file, savedRange) {
       if (!file || !file.type.startsWith('image/')) return alert('이미지 파일만 붙여넣을 수 있습니다.');
       if (file.size > 3 * 1024 * 1024) return alert('이미지는 3MB 이하로 붙여넣어 주세요.');
@@ -2710,6 +2772,10 @@
         }
       }
       return sanitizeNoticeHtml(container.innerHTML);
+    }
+
+    async function uploadInlineAnswerImages(itemId, html) {
+      return uploadInlineNoticeImages(itemId, html);
     }
 
     function editSelectedContent() {
@@ -2758,14 +2824,16 @@
       const categoryId = $('itemCategory').value;
       const author = $('editorName').value.trim();
       const question = $('itemQuestion').value.trim();
-      const answer = $('itemAnswer').value.trim();
+      let answer = sanitizeNoticeHtml($('itemAnswer').innerHTML).trim();
+      const hasAnswer = $('itemAnswer').textContent.trim() || /<img\b/i.test(answer);
       if (categoryId === '__custom__') return alert('직접 입력한 카테고리를 먼저 추가해 주세요.');
-      if (!categoryId || !author || !question || !answer) return alert('카테고리, 작성자, 질문, 답변을 모두 입력해 주세요.');
+      if (!categoryId || !author || !question || !hasAnswer) return alert('카테고리, 작성자, 질문, 답변을 모두 입력해 주세요.');
       const now = nowISO();
       const itemId = state.selectedItemId || makeId('faq');
       $('saveItemBtn').disabled = true;
       $('saveItemBtn').textContent = '저장 중...';
       try {
+        answer = await uploadInlineAnswerImages(itemId, answer);
         let imageData = pendingImageData;
         let imagePath = selectedItem()?.imagePath || '';
         if (pendingImageData?.startsWith('data:image/') && state.backend === 'supabase') {
@@ -3031,7 +3099,7 @@
           <button class="activity-detail-item" data-activity-item="${item.id}">
             <strong>${escapeHtml(item.question)}</strong>
             <span>${escapeHtml(categoryName(item.categoryId))} · ${formatDate(item.createdAt)}</span>
-            <p>${escapeHtml(item.answer)}</p>
+            <p>${escapeHtml(htmlToPlainText(item.answer))}</p>
           </button>`).join('') : '<div class="empty">등록된 글이 없습니다.</div>';
       } else {
         const comments = [
@@ -3156,8 +3224,10 @@
     $('itemAnswer').addEventListener('paste', event => {
       const imageItem = [...(event.clipboardData?.items || [])].find(item => item.type.startsWith('image/'));
       if (!imageItem) return;
+      const selection = window.getSelection();
+      const savedRange = selection.rangeCount ? selection.getRangeAt(0).cloneRange() : null;
       event.preventDefault();
-      attachImageFile(imageItem.getAsFile());
+      pasteInlineAnswerImage(imageItem.getAsFile(), savedRange);
     });
     $('removeImageBtn').onclick = () => { pendingImageData = ''; $('answerImageInput').value = ''; updateAttachmentPreview(); };
     $('expandEditorBtn').onclick = () => toggleEditorSize();

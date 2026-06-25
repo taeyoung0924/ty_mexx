@@ -1387,6 +1387,22 @@
       object-fit: contain;
     }
 
+
+    /* Dark mode editor return button */
+    :root[data-theme="dark"] #clearFormBtn.btn-secondary,
+    :root[data-theme="dark"] .editor-actions .btn-secondary {
+      color: #eef2f7;
+      background: #1d2940;
+      border-color: rgba(226, 232, 240, .24);
+      box-shadow: none;
+    }
+    :root[data-theme="dark"] #clearFormBtn.btn-secondary:hover,
+    :root[data-theme="dark"] .editor-actions .btn-secondary:hover {
+      color: #ffffff;
+      background: #263653;
+      border-color: rgba(226, 232, 240, .32);
+    }
+
   </style>
 </head>
 <body>

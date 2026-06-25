@@ -1312,12 +1312,44 @@
       border-color: rgba(145, 160, 255, .22);
     }
 
+
+    /* Home brand and Notice archive return button */
+    .gnb-brand {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      text-align: left;
+    }
+    .gnb-brand:hover strong,
+    .gnb-brand:focus-visible strong {
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+    .questions-return-btn {
+      min-height: 30px;
+      color: #4d596b;
+      background: #f1f3f6;
+      border-color: #e1e5eb;
+      box-shadow: none;
+    }
+    .questions-return-btn:hover {
+      color: var(--text);
+      background: #e9edf3;
+      box-shadow: none;
+    }
+    :root[data-theme="dark"] .questions-return-btn {
+      color: #d7deea;
+      background: rgba(226, 232, 240, .12);
+      border-color: rgba(226, 232, 240, .16);
+    }
+
   </style>
 </head>
 <body>
     <div class="app">
     <header class="gnb">
-      <div class="gnb-brand"><img src="./mexx_white.png" alt="MEXX"><span></span><strong>Team Playbook</strong></div>
+      <button class="gnb-brand" id="homeBrandBtn" type="button" aria-label="첫 화면으로 이동"><img src="./mexx_white.png" alt="MEXX"><span></span><strong>Team Playbook</strong></button>
       <div class="gnb-search"><input type="text" id="searchInput" placeholder="질문 또는 답변 검색"></div>
       <div class="gnb-actions">
         <button class="btn btn-primary" id="addFaqBtn" type="button">FAQ추가</button>
@@ -1388,7 +1420,7 @@
       <section class="panel issue-archive hidden" id="issueArchivePanel">
         <div class="list-title">
           <strong id="issueArchiveTitle">이슈사항 전체 목록</strong>
-          <button class="btn btn-secondary" id="backToQuestionListBtn" type="button">질문 목록</button>
+          <button class="btn btn-secondary questions-return-btn" id="backToQuestionListBtn" type="button">Questions</button>
         </div>
         <div class="issue-archive-list" id="issueArchiveList"></div>
       </section>
@@ -2114,6 +2146,20 @@
       state.noticeListType = null;
       renderIssueArchive();
       if (scroll) $('categoryToolbar').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function goHome() {
+      state.noticeListType = null;
+      state.search = '';
+      state.selectedCategoryId = 'all';
+      state.selectedItemId = null;
+      state.selectedNoticeId = null;
+      state.page = 1;
+      state.archivePage = 1;
+      $('searchInput').value = '';
+      showBrowseMode(false);
+      renderAll();
+      document.querySelector('.app').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function renderSidebarActivity() {
@@ -3098,6 +3144,7 @@
     $('removeImageBtn').onclick = () => { pendingImageData = ''; $('answerImageInput').value = ''; updateAttachmentPreview(); };
     $('expandEditorBtn').onclick = () => toggleEditorSize();
     $('editorBackdrop').onclick = () => toggleEditorSize(true);
+    $('homeBrandBtn').onclick = goHome;
     $('viewerEditBtn').onclick = editSelectedContent;
     $('viewerDeleteBtn').onclick = deleteSelectedContent;
     $('addCommentBtn').onclick = addComment;

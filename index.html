@@ -262,6 +262,8 @@
     .viewer-label { color: var(--text); font-weight: 600; }
     .viewer-question { font-weight: 600; line-height: 1.6; white-space: pre-wrap; }
     .viewer-meta { color: var(--sub); opacity: 1; white-space: nowrap; text-align: right; line-height: 1.6; }
+    .viewer-meta .meta-author::after,
+    .viewer-meta .meta-created::after { content: '\A'; white-space: pre; }
     .viewer-answer { display: grid; grid-template-columns: 58px 1fr; gap: 12px; min-height: 120px; padding: 18px 16px; line-height: 1.75; }
     .viewer-answer-text { white-space: pre-wrap; }
     .answer-image { display: block; max-width: min(100%, 680px); max-height: 440px; margin-top: 14px; border: 1px solid var(--line); border-radius: 9px; object-fit: contain; }
@@ -558,7 +560,8 @@
       .issue-board { gap: 38px; }
       .viewer-head, .viewer-answer { grid-template-columns: 1fr; }
       .viewer-meta { text-align: left; white-space: normal; }
-      .viewer-meta .meta-created { display: none; }
+      .viewer-meta .meta-author, .viewer-meta .meta-modified { display: block; }
+      .viewer-meta .meta-created { display: none !important; }
       .comments { margin-left: 0; }
     }
 
@@ -887,7 +890,8 @@
       .panel, .list-panel, .viewer, .issue-archive, .editor { border-radius: 10px; padding: 18px; }
       .viewer-head, .viewer-answer { grid-template-columns: 1fr; }
       .viewer-meta { text-align: left; white-space: normal; }
-      .viewer-meta .meta-created { display: none; }
+      .viewer-meta .meta-author, .viewer-meta .meta-modified { display: block; }
+      .viewer-meta .meta-created { display: none !important; }
       .comments { margin-left: 0; }
       .comment-form { grid-template-columns: 1fr; }
       .table-wrap { height: auto; }
@@ -2345,7 +2349,7 @@
         $('viewQuestion').classList.add('viewer-empty');
         $('viewAnswer').textContent = '선택한 질문의 답변이 여기에 표시됩니다.';
         $('viewAnswer').classList.add('viewer-empty');
-        $('viewMeta').innerHTML = '<span class="meta-author">작성자 -</span><br><span class="meta-created">작성일시 -</span><br><span class="meta-modified">최종 수정일시 -</span>';
+        $('viewMeta').innerHTML = '<span class="meta-author">작성자 -</span><span class="meta-created">작성일시 -</span><span class="meta-modified">최종 수정일시 -</span>';
         $('viewAnswerImage').classList.add('hidden');
         $('viewAnswerImage').removeAttribute('src');
         $('commentList').innerHTML = '<div class="muted">질문을 선택하면 댓글이 표시됩니다.</div>';
@@ -2357,7 +2361,7 @@
       $('viewAnswer').innerHTML = answerContentToHtml(item.answer);
       $('viewAnswer').classList.remove('viewer-empty');
       const finalModifiedAt = item.revisionHistory?.[item.revisionHistory.length - 1]?.at || item.updatedAt || item.createdAt;
-      $('viewMeta').innerHTML = `<span class="meta-author">작성자 ${escapeHtml(item.author || '-')}</span><br><span class="meta-created">작성일시 ${formatDate(item.createdAt)}</span><br><span class="meta-modified">최종 수정일시 ${formatDate(finalModifiedAt)}</span>`;
+      $('viewMeta').innerHTML = `<span class="meta-author">작성자 ${escapeHtml(item.author || '-')}</span><span class="meta-created">작성일시 ${formatDate(item.createdAt)}</span><span class="meta-modified">최종 수정일시 ${formatDate(finalModifiedAt)}</span>`;
       if (item.imageData) {
         $('viewAnswerImage').src = item.imageData;
         $('viewAnswerImage').classList.remove('hidden');

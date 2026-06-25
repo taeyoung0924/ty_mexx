@@ -2141,7 +2141,6 @@
           ? rows.map(notice => `
             <button class="issue-item" data-notice-id="${notice.id}" title="${escapeHtml(notice.title)}">
               <span class="issue-item-title">${escapeHtml(notice.title)}</span>
-              <span class="issue-item-edit-btn" data-edit-notice-id="${notice.id}" role="button" tabindex="0" title="수정">수정</span>
               <span class="issue-item-date">${formatCompactDate(notice.createdAt)}</span>
             </button>`).join('')
           : '<span class="muted">등록된 이슈가 없습니다.</span>';

@@ -1543,11 +1543,34 @@
         flex: 0 0 auto;
       }
 
+      #questionListPanel table {
+        table-layout: fixed;
+        width: 100%;
+      }
+
+      #questionListPanel th:nth-child(1),
+      #questionListPanel td:nth-child(1) {
+        width: 90px;
+      }
+
       #questionListPanel th:nth-child(2),
       #questionListPanel td:nth-child(2) {
-        max-width: 0;
+        width: auto;
+        min-width: 0;
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      #questionListPanel th:nth-child(3),
+      #questionListPanel td:nth-child(3) {
+        width: 90px;
+      }
+
+      #questionListPanel th:nth-child(4),
+      #questionListPanel td:nth-child(4) {
+        width: 230px;
+        text-align: left;
         white-space: nowrap;
       }
     }

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
@@ -1511,6 +1511,47 @@
         height: 26px;
       }
     }
+
+
+    /* PC 질문 목록 높이 고정: 긴 질문/답변이 있어도 목록 패널이 늘어나지 않게 처리 */
+    @media (min-width: 981px) {
+      .content {
+        grid-template-rows: 360px minmax(320px, 1fr) !important;
+      }
+
+      #questionListPanel.list-panel {
+        height: 360px !important;
+        min-height: 360px !important;
+        max-height: 360px !important;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      #questionListPanel .list-title {
+        flex: 0 0 auto;
+      }
+
+      #questionListPanel .table-wrap {
+        flex: 1 1 auto;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: auto;
+      }
+
+      #questionListPanel .pagination {
+        flex: 0 0 auto;
+      }
+
+      #questionListPanel th:nth-child(2),
+      #questionListPanel td:nth-child(2) {
+        max-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -3442,4 +3483,3 @@
   </script>
 </body>
 </html>
-

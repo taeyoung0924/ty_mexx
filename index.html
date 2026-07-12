@@ -1642,7 +1642,7 @@
         <span class="gnb-nav-sep" aria-hidden="true">|</span>
         <button class="gnb-nav-link" id="libraryNavBtn" type="button">Library</button>
       </div>
-      <div class="gnb-search">
+      <div class="gnb-search" id="gnbSearchWrap">
         <input type="text" id="searchInput" placeholder="질문 또는 답변 검색">
         <button class="btn btn-primary gnb-faq-mobile" id="addFaqBtnMobile" type="button">FAQ추가</button>
       </div>
@@ -3725,6 +3725,7 @@
     function updateGnbBrandState(classDataActive = isMaterialCategory(state.selectedCategoryId)) {
       const mobile = isMobileGnb();
       $('sidebarPanel').classList.toggle('hidden', mobile && classDataActive);
+      $('gnbSearchWrap').classList.toggle('hidden', mobile && classDataActive);
     }
 
     function applyDefaultCalendarState() {

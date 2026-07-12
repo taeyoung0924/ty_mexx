@@ -482,40 +482,7 @@
     }
     .gnb-nav-link:hover { opacity: 1; color: #ff9c52; }
     .gnb-nav-link.active { opacity: 1; color: #ff7b22; }
-    .gnb-dropdown-caret { display: none; color: #fff; font-size: 9pt; opacity: .8; margin-left: 2px; }
-    .gnb-dropdown { display: none; }
-    .gnb-dropdown:not(.hidden) { display: block; }
     .gnb-brand { display: flex; align-items: center; gap: 14px; min-width: 0; color: #fff; }
-    .gnb-dropdown {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      margin-top: 8px;
-      background: #0b2542;
-      border: 1px solid rgba(255,255,255,.15);
-      border-radius: 10px;
-      padding: 6px;
-      min-width: 170px;
-      box-shadow: 0 8px 24px rgba(0,0,0,.4);
-      z-index: 50;
-    }
-    .gnb-dropdown-item {
-      display: flex;
-      align-items: center;
-      width: 100%;
-      gap: 6px;
-      padding: 9px 10px;
-      border: none;
-      border-radius: 6px;
-      background: transparent;
-      color: #fff;
-      font-size: 9.5pt;
-      font-weight: 600;
-      text-align: left;
-      white-space: nowrap;
-    }
-    .gnb-dropdown-item:hover { background: rgba(255,255,255,.1); }
-    .gnb-dropdown-item.active { color: #ff9c52; }
     .gnb-brand img { width: 130px; max-height: 26px; object-fit: contain; }
     .gnb-brand span { width: 1px; height: 22px; background: rgba(255,255,255,.75); }
     .gnb-brand strong { font-size: 15pt; font-weight: 700; letter-spacing: 0; }
@@ -960,9 +927,10 @@
         padding: 10px 14px;
       }
       .gnb-brand { grid-column: 1; grid-row: 1; }
-      .gnb-brand-wrap { grid-column: 1; grid-row: 1; }
-      .gnb-nav-sep, .gnb-nav-link { display: none !important; }
-      .gnb-dropdown-caret { display: none; }
+      .gnb-brand-wrap { grid-column: 1; grid-row: 1; min-width: 0; overflow: hidden; }
+      .gnb-brand strong { font-size: 11pt; }
+      .gnb-nav-sep { font-size: 9pt; }
+      .gnb-nav-link { font-size: 9pt; padding: 4px 0; }
       .gnb-actions { grid-column: 2; grid-row: 1; justify-content: flex-end; gap: 6px; }
       .gnb-search { grid-column: 1 / -1; grid-row: 2; }
       .gnb-search input { flex: 1; min-width: 0; }
@@ -1659,13 +1627,9 @@
     <div class="app">
     <header class="gnb">
       <div class="gnb-brand-wrap" id="gnbBrandWrap">
-        <button class="gnb-brand" id="homeBrandBtn" type="button" aria-label="첫 화면으로 이동"><img src="./mexx_white.png" alt="MEXX"><span></span><strong id="gnbBrandLabel">Team Playbook</strong><span class="gnb-dropdown-caret" id="gnbDropdownCaret">▾</span></button>
+        <button class="gnb-brand" id="homeBrandBtn" type="button" aria-label="첫 화면으로 이동"><img src="./mexx_white.png" alt="MEXX"><span></span><strong id="gnbBrandLabel">Team Playbook</strong></button>
         <span class="gnb-nav-sep" aria-hidden="true">|</span>
         <button class="gnb-nav-link" id="libraryNavBtn" type="button">Library</button>
-        <div class="gnb-dropdown hidden" id="gnbDropdownMenu">
-          <button class="gnb-dropdown-item" id="homeDropdownBtn" type="button">🏠 Team Playbook</button>
-          <button class="gnb-dropdown-item" id="libraryDropdownBtn" type="button">📚 Library</button>
-        </div>
       </div>
       <div class="gnb-search">
         <input type="text" id="searchInput" placeholder="질문 또는 답변 검색">
@@ -2484,7 +2448,6 @@
       $('categoryFilter').value = state.selectedCategoryId;
       const classDataActive = isMaterialCategory(state.selectedCategoryId);
       $('libraryNavBtn').classList.toggle('active', classDataActive);
-      $('libraryDropdownBtn').classList.toggle('active', classDataActive);
       $('categoryToolbar').querySelector('.category-toolbar-title strong').textContent = classDataActive ? 'Library' : '카테고리';
       $('categoryToolbar').querySelector('.category-toolbar-title .muted').textContent = classDataActive ? '강사별 · 주차별 수업자료' : '질문 분류';
       toggleDriveEmbedPanel(classDataActive);
@@ -3750,9 +3713,6 @@
 
     function updateGnbBrandState(classDataActive = isMaterialCategory(state.selectedCategoryId)) {
       const mobile = isMobileGnb();
-      $('gnbBrandLabel').textContent = (mobile && classDataActive) ? 'Library' : 'Team Playbook';
-      $('libraryDropdownBtn').classList.toggle('hidden', mobile && classDataActive);
-      $('homeDropdownBtn').classList.toggle('hidden', !(mobile && classDataActive));
       $('sidebarPanel').classList.toggle('hidden', mobile && classDataActive);
     }
 
@@ -3765,21 +3725,8 @@
     const mobileGnbQuery = window.matchMedia('(max-width: 980px)');
     mobileGnbQuery.addEventListener('change', () => { applyDefaultCalendarState(); updateGnbBrandState(); });
 
-    function openGnbDropdown() { $('gnbDropdownMenu').classList.remove('hidden'); $('gnbDropdownCaret').textContent = '▴'; }
-    function closeGnbDropdown() { $('gnbDropdownMenu').classList.add('hidden'); $('gnbDropdownCaret').textContent = '▾'; }
-    function toggleGnbDropdown() { $('gnbDropdownMenu').classList.contains('hidden') ? openGnbDropdown() : closeGnbDropdown(); }
-
-    $('homeBrandBtn').onclick = event => {
-      if (isMobileGnb()) { event.preventDefault(); toggleGnbDropdown(); return; }
-      goHome();
-    };
+    $('homeBrandBtn').onclick = goHome;
     $('libraryNavBtn').onclick = openLibraryView;
-    $('homeDropdownBtn').onclick = () => { closeGnbDropdown(); goHome(); };
-    $('libraryDropdownBtn').onclick = () => { closeGnbDropdown(); openLibraryView(); };
-    document.addEventListener('click', event => {
-      if (!$('gnbBrandWrap').contains(event.target)) closeGnbDropdown();
-    });
-    window.addEventListener('resize', () => { if (!isMobileGnb()) closeGnbDropdown(); });
     $('viewerEditBtn').onclick = editSelectedContent;
     $('viewerDeleteBtn').onclick = deleteSelectedContent;
     $('addCommentBtn').onclick = addComment;

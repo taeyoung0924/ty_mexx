@@ -176,6 +176,27 @@
     .side-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; margin-top: 12px; }
     .side-actions .btn { min-width: 0; padding-inline: 6px; white-space: nowrap; }
     .category-toolbar { display: grid; grid-template-columns: auto minmax(150px, 1fr) auto; align-items: center; gap: 10px; padding: 12px 16px; }
+    .drive-embed-panel { padding: 14px 16px; display: grid; gap: 10px; }
+    .drive-embed-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .drive-embed-head strong { font-size: 10.5pt; }
+    .drive-embed-head a { color: var(--primary); font-weight: 600; font-size: 8.5pt; text-decoration: none; }
+    .drive-embed-head a:hover { text-decoration: underline; }
+    .drive-embed-frame { width: 100%; height: 640px; border: 1px solid var(--line); border-radius: 8px; background: var(--input); }
+    .drive-breadcrumb { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: 8.5pt; color: var(--sub); }
+    .drive-breadcrumb button { background: transparent; border: none; padding: 2px 4px; color: var(--primary); font-weight: 600; font-size: 8.5pt; }
+    .drive-breadcrumb button:hover { text-decoration: underline; }
+    .drive-breadcrumb button:disabled { color: var(--text); font-weight: 700; cursor: default; text-decoration: none; }
+    .drive-breadcrumb .sep { color: var(--sub); }
+    .drive-file-list { height: 600px; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--input); }
+    .drive-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-bottom: 1px solid var(--line); text-decoration: none; color: var(--text); background: none; width: 100%; text-align: left; border-left: none; border-right: none; border-top: none; }
+    .drive-row:last-child { border-bottom: none; }
+    .drive-row:hover { background: var(--surface-soft); }
+    .drive-row-icon { font-size: 12pt; flex-shrink: 0; }
+    .drive-row-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 9pt; }
+    .drive-row-meta { flex-shrink: 0; color: var(--sub); font-size: 8pt; }
+    .drive-empty { padding: 30px 12px; text-align: center; }
+    .drive-error { padding: 16px; color: var(--danger); font-size: 8.5pt; line-height: 1.6; }
+    .drive-error a { color: var(--danger); font-weight: 700; }
     .category-toolbar-title { display: grid; gap: 2px; min-width: 100px; }
     .category-toolbar-title strong { font-weight: 600; }
     .category-toolbar-actions { display: flex; gap: 6px; }
@@ -444,7 +465,54 @@
       background: #051b35;
       border-bottom: 5px solid #ff7b22;
     }
+    .gnb-brand-wrap { position: relative; display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .gnb-nav-sep { color: rgba(255,255,255,.4); font-weight: 300; font-size: 11pt; }
+    .gnb-nav-link {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 11pt;
+      font-weight: 600;
+      padding: 4px 2px;
+      opacity: .82;
+      white-space: nowrap;
+    }
+    .gnb-nav-link:hover { opacity: 1; color: #ff9c52; }
+    .gnb-nav-link.active { opacity: 1; color: #ff7b22; }
+    .gnb-dropdown-caret { display: none; color: #fff; font-size: 9pt; opacity: .8; margin-left: 2px; }
+    .gnb-dropdown { display: none; }
+    .gnb-dropdown:not(.hidden) { display: block; }
     .gnb-brand { display: flex; align-items: center; gap: 14px; min-width: 0; color: #fff; }
+    .gnb-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: 8px;
+      background: #0b2542;
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 10px;
+      padding: 6px;
+      min-width: 170px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.4);
+      z-index: 50;
+    }
+    .gnb-dropdown-item {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      gap: 6px;
+      padding: 9px 10px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: #fff;
+      font-size: 9.5pt;
+      font-weight: 600;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .gnb-dropdown-item:hover { background: rgba(255,255,255,.1); }
+    .gnb-dropdown-item.active { color: #ff9c52; }
     .gnb-brand img { width: 130px; max-height: 26px; object-fit: contain; }
     .gnb-brand span { width: 1px; height: 22px; background: rgba(255,255,255,.75); }
     .gnb-brand strong { font-size: 15pt; font-weight: 700; letter-spacing: 0; }
@@ -889,6 +957,9 @@
         padding: 10px 14px;
       }
       .gnb-brand { grid-column: 1; grid-row: 1; }
+      .gnb-brand-wrap { grid-column: 1; grid-row: 1; }
+      .gnb-nav-sep, .gnb-nav-link { display: none; }
+      .gnb-dropdown-caret { display: inline-block; }
       .gnb-actions { grid-column: 2; grid-row: 1; justify-content: flex-end; gap: 6px; }
       .gnb-search { grid-column: 1 / -1; grid-row: 2; }
       .gnb-search input { flex: 1; min-width: 0; }
@@ -1576,11 +1647,23 @@
     }
 
 </style>
+  <script>
+    // 자료실(Library) - 구글 드라이브 API 키 설정
+    window.RSDC_DRIVE_CONFIG = { apiKey: 'AIzaSyCjpDGi_ARrCdkqaNZtEuq53_-gcx5PJv0' };
+  </script>
 </head>
 <body>
     <div class="app">
     <header class="gnb">
-      <button class="gnb-brand" id="homeBrandBtn" type="button" aria-label="첫 화면으로 이동"><img src="./mexx_white.png" alt="MEXX"><span></span><strong>Team Playbook</strong></button>
+      <div class="gnb-brand-wrap" id="gnbBrandWrap">
+        <button class="gnb-brand" id="homeBrandBtn" type="button" aria-label="첫 화면으로 이동"><img src="./mexx_white.png" alt="MEXX"><span></span><strong>Team Playbook</strong><span class="gnb-dropdown-caret" id="gnbDropdownCaret">▾</span></button>
+        <span class="gnb-nav-sep" aria-hidden="true">|</span>
+        <button class="gnb-nav-link" id="libraryNavBtn" type="button">Library</button>
+        <div class="gnb-dropdown hidden" id="gnbDropdownMenu">
+          <button class="gnb-dropdown-item" id="homeDropdownBtn" type="button">🏠 Team Playbook</button>
+          <button class="gnb-dropdown-item" id="libraryDropdownBtn" type="button">📚 Library</button>
+        </div>
+      </div>
       <div class="gnb-search">
         <input type="text" id="searchInput" placeholder="질문 또는 답변 검색">
         <button class="btn btn-primary gnb-faq-mobile" id="addFaqBtnMobile" type="button">FAQ추가</button>
@@ -1653,6 +1736,15 @@
         </div>
       </section>
 
+      <section class="panel drive-embed-panel hidden" id="driveEmbedPanel">
+        <div class="drive-embed-head">
+          <strong>📁 구글 드라이브 자료실</strong>
+          <a href="#" target="_blank" rel="noopener noreferrer" id="driveEmbedOpenLink">드라이브에서 전체 열기 ↗</a>
+        </div>
+        <div class="drive-breadcrumb" id="driveBreadcrumb"></div>
+        <div class="drive-file-list" id="driveFileList"><div class="drive-empty muted">불러오는 중...</div></div>
+      </section>
+
       <section class="panel issue-archive hidden" id="issueArchivePanel">
         <div class="list-title">
           <strong id="issueArchiveTitle">이슈사항 전체 목록</strong>
@@ -1684,6 +1776,7 @@
         <div class="viewer-answer">
           <div class="viewer-label" id="viewAnswerLabel">Answer</div>
           <div>
+            <a class="btn btn-primary hidden" id="viewMaterialLink" href="#" target="_blank" rel="noopener noreferrer" style="display:inline-flex;margin-bottom:10px;text-decoration:none;">📁 구글 드라이브에서 자료 열기</a>
             <div class="viewer-answer-text viewer-empty" id="viewAnswer">선택한 질문의 답변이 여기에 표시됩니다.</div>
             <img class="answer-image hidden" id="viewAnswerImage" alt="답변 첨부 이미지">
           </div>
@@ -1719,9 +1812,12 @@
             <button class="btn btn-primary hidden" type="button" id="confirmCustomCategoryBtn">추가</button>
           </div>
         </div>
+        <div class="field" id="materialInstructorField" style="display:none;"><label for="itemInstructor">강사</label><select id="itemInstructor"></select></div>
+        <div class="field" id="materialWeekField" style="display:none;"><label for="itemWeek">주차</label><select id="itemWeek"></select></div>
+        <div class="field" id="materialLinkField" style="display:none;"><label for="itemMaterialUrl">구글 드라이브 링크</label><input type="url" id="itemMaterialUrl" placeholder="https://drive.google.com/..."></div>
         <div class="field"><label for="editorName">작성자</label><input type="text" id="editorName" placeholder="이름"></div>
-        <div class="field"><label for="itemQuestion">질문</label><textarea id="itemQuestion" rows="2" placeholder="질문을 입력하세요"></textarea></div>
-        <div class="field"><label for="itemAnswer">답변</label><div class="rich-editor faq-answer-editor" id="itemAnswer" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="답변을 입력하세요"></div><span class="muted">답변 입력창에 이미지를 붙여넣으면 커서 위치에 이미지가 들어갑니다.</span></div>
+        <div class="field"><label for="itemQuestion" id="itemQuestionLabel">질문</label><textarea id="itemQuestion" rows="2" placeholder="질문을 입력하세요"></textarea></div>
+        <div class="field"><label for="itemAnswer" id="itemAnswerLabel">답변</label><div class="rich-editor faq-answer-editor" id="itemAnswer" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="답변을 입력하세요"></div><span class="muted">답변 입력창에 이미지를 붙여넣으면 커서 위치에 이미지가 들어갑니다.</span></div>
         <div class="field">
           <label for="answerImageInput">답변 이미지 첨부</label>
           <input type="file" id="answerImageInput" accept="image/*">
@@ -1872,6 +1968,13 @@
 
   <script src="./supabase-config.js"></script>
   <script>
+    // TODO: 실제 강사 명단으로 교체해 주세요.
+    const INSTRUCTOR_LIST = ['강사1', '강사2', '강사3'];
+    const MATERIAL_CATEGORY_NAME = '자료실';
+    const DRIVE_FOLDER_ID = '15nNmV6fg9qXM-X5c2L3-Dcbugfzg27lZ';
+    const DRIVE_FOLDER_URL = `https://drive.google.com/drive/folders/${DRIVE_FOLDER_ID}?usp=sharing`;
+    const DRIVE_API_KEY = window.RSDC_DRIVE_CONFIG?.apiKey || '';
+    const driveState = { path: [{ id: DRIVE_FOLDER_ID, name: '자료실' }], loading: false };
     const STORAGE = 'rsdc_faq_items_v2';
     const CATEGORY_STORAGE = 'rsdc_faq_categories_v2';
     const TRASH_STORAGE = 'rsdc_faq_trash_v1';
@@ -2008,7 +2111,7 @@
       if (item.updatedAt && item.updatedAt !== item.createdAt && !revisionHistory.some(entry => entry.at === item.updatedAt)) {
         revisionHistory.push({ at: item.updatedAt });
       }
-      return { ...item, comments: item.comments || [], imageData: item.imageData || '', imagePath: item.imagePath || '', revisionHistory };
+      return { ...item, comments: item.comments || [], imageData: item.imageData || '', imagePath: item.imagePath || '', instructor: item.instructor || '', week: item.week || '', materialUrl: item.materialUrl || '', revisionHistory };
     }
 
     function loadLocalData() {
@@ -2018,6 +2121,7 @@
       state.trashItems = JSON.parse(localStorage.getItem(TRASH_STORAGE) || '[]');
       state.notices = JSON.parse(localStorage.getItem(NOTICE_STORAGE) || '[]');
       state.schedules = JSON.parse(localStorage.getItem(SCHEDULE_STORAGE) || '[]');
+      if (ensureMaterialCategory()) persistLocalData();
       seedSchedulesIfEmpty();
     }
 
@@ -2074,6 +2178,9 @@
         author: row.author,
         imageData: row.image_url || '',
         imagePath: row.image_path || '',
+        instructor: row.instructor || '',
+        week: row.week || '',
+        materialUrl: row.material_url || '',
         comments: row.comments || [],
         revisionHistory: row.revision_history || [],
         createdAt: row.created_at,
@@ -2090,6 +2197,9 @@
         author: item.author,
         image_url: item.imageData || null,
         image_path: item.imagePath || null,
+        instructor: item.instructor || null,
+        week: item.week || null,
+        material_url: item.materialUrl || null,
         comments: item.comments || [],
         revision_history: item.revisionHistory || [],
         created_at: item.createdAt,
@@ -2125,6 +2235,10 @@
       }));
       state.notices = (notices || []).map(row => ({ id: row.id, type: row.notice_type, title: row.title, content: row.content, author: row.author, imageData: row.image_url || '', imagePath: row.image_path || '', comments: Array.isArray(row.comments) ? row.comments : [], createdAt: row.created_at, updatedAt: row.updated_at }));
       state.backend = 'supabase';
+      if (ensureMaterialCategory()) {
+        try { await supabaseClient.from('rsdc_faq_categories').upsert([{ id: materialCategoryId(), name: MATERIAL_CATEGORY_NAME }], { onConflict: 'id' }); }
+        catch (error) { /* 다음 저장 시 다시 시도됩니다 */ }
+      }
       try { await loadRemoteSchedules(); }
       catch (scheduleError) { state.scheduleBackend = 'local'; updateSupabaseStatus(`일정 테이블 연결 실패: ${scheduleError.message || scheduleError}`, 'error'); }
       persistLocalData();
@@ -2197,6 +2311,94 @@
     }
 
     function categoryName(id) { return state.categories.find(category => category.id === id)?.name || '미분류'; }
+    function isMaterialCategory(categoryId) { return categoryName(categoryId) === MATERIAL_CATEGORY_NAME; }
+    function materialCategoryId() { return state.categories.find(category => category.name === MATERIAL_CATEGORY_NAME)?.id || ''; }
+    function toggleDriveEmbedPanel(show) {
+      $('driveEmbedPanel').classList.toggle('hidden', !show);
+      $('viewerPanel').classList.toggle('hidden', show);
+      if (show && !driveState.loaded) {
+        driveState.loaded = true;
+        loadDriveFolder(DRIVE_FOLDER_ID, '자료실', true);
+      }
+    }
+
+    function driveFileIcon(mimeType) {
+      if (mimeType === 'application/vnd.google-apps.folder') return '📁';
+      if (mimeType?.includes('pdf')) return '📕';
+      if (mimeType?.includes('presentation')) return '📊';
+      if (mimeType?.includes('spreadsheet')) return '📗';
+      if (mimeType?.includes('document')) return '📄';
+      if (mimeType?.includes('image')) return '🖼️';
+      if (mimeType?.includes('video')) return '🎬';
+      return '📎';
+    }
+
+    function formatDriveSize(bytes) {
+      if (!bytes) return '';
+      const size = Number(bytes);
+      if (size < 1024) return `${size}B`;
+      if (size < 1024 * 1024) return `${(size / 1024).toFixed(0)}KB`;
+      return `${(size / (1024 * 1024)).toFixed(1)}MB`;
+    }
+
+    function renderDriveBreadcrumb() {
+      $('driveBreadcrumb').innerHTML = driveState.path.map((crumb, index) => {
+        const isLast = index === driveState.path.length - 1;
+        return `${index > 0 ? '<span class="sep">›</span>' : ''}<button type="button" data-drive-crumb="${index}" ${isLast ? 'disabled' : ''}>${escapeHtml(crumb.name)}</button>`;
+      }).join('');
+      document.querySelectorAll('[data-drive-crumb]').forEach(button => button.onclick = () => {
+        const index = Number(button.dataset.driveCrumb);
+        const target = driveState.path[index];
+        driveState.path = driveState.path.slice(0, index + 1);
+        loadDriveFolder(target.id, target.name, false);
+      });
+    }
+
+    function renderDriveFiles(files) {
+      if (!files.length) {
+        $('driveFileList').innerHTML = '<div class="drive-empty muted">이 폴더에는 파일이 없습니다.</div>';
+        return;
+      }
+      $('driveFileList').innerHTML = files.map(file => {
+        const isFolder = file.mimeType === 'application/vnd.google-apps.folder';
+        const meta = isFolder ? '' : formatDriveSize(file.size);
+        if (isFolder) {
+          return `<button type="button" class="drive-row" data-drive-folder="${file.id}" data-drive-name="${escapeHtml(file.name)}"><span class="drive-row-icon">${driveFileIcon(file.mimeType)}</span><span class="drive-row-name">${escapeHtml(file.name)}</span><span class="drive-row-meta">열기 ›</span></button>`;
+        }
+        return `<a class="drive-row" href="${file.webViewLink || '#'}" target="_blank" rel="noopener noreferrer"><span class="drive-row-icon">${driveFileIcon(file.mimeType)}</span><span class="drive-row-name">${escapeHtml(file.name)}</span><span class="drive-row-meta">${meta}</span></a>`;
+      }).join('');
+      document.querySelectorAll('[data-drive-folder]').forEach(button => button.onclick = () => {
+        driveState.path.push({ id: button.dataset.driveFolder, name: button.dataset.driveName });
+        loadDriveFolder(button.dataset.driveFolder, button.dataset.driveName, false);
+      });
+    }
+
+    async function loadDriveFolder(folderId, folderName, resetPath) {
+      if (resetPath) driveState.path = [{ id: folderId, name: folderName }];
+      renderDriveBreadcrumb();
+      if (!DRIVE_API_KEY) {
+        $('driveFileList').innerHTML = `<div class="drive-error">구글 드라이브 API 키가 설정되지 않았어요.<br>폴더 목록을 사이트 안에서 보려면 Google Cloud에서 Drive API용 API 키를 발급받아<br><code>window.RSDC_DRIVE_CONFIG = { apiKey: '발급받은 키' }</code> 형태로 페이지에 추가해 주세요.<br><br><a href="${DRIVE_FOLDER_URL}" target="_blank" rel="noopener noreferrer">그동안은 여기를 눌러 드라이브에서 바로 확인해 주세요 ↗</a></div>`;
+        return;
+      }
+      $('driveFileList').innerHTML = '<div class="drive-empty muted">불러오는 중...</div>';
+      try {
+        const query = encodeURIComponent(`'${folderId}' in parents and trashed = false`);
+        const fields = encodeURIComponent('files(id,name,mimeType,webViewLink,size)');
+        const url = `https://www.googleapis.com/drive/v3/files?q=${query}&key=${DRIVE_API_KEY}&fields=${fields}&orderBy=folder,name&pageSize=200`;
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data.error) throw new Error(data.error.message || '알 수 없는 오류');
+        renderDriveFiles(data.files || []);
+      } catch (error) {
+        $('driveFileList').innerHTML = `<div class="drive-error">폴더를 불러오지 못했어요: ${escapeHtml(error.message || String(error))}<br>드라이브 폴더 공유 설정이 "링크가 있는 모든 사용자"인지 확인해 주세요.<br><br><a href="${DRIVE_FOLDER_URL}" target="_blank" rel="noopener noreferrer">드라이브에서 바로 확인하기 ↗</a></div>`;
+      }
+    }
+
+    function ensureMaterialCategory() {
+      if (state.categories.some(category => category.name === MATERIAL_CATEGORY_NAME)) return false;
+      state.categories.push({ id: 'cat_materials', name: MATERIAL_CATEGORY_NAME });
+      return true;
+    }
     function selectedItem() { return state.items.find(item => item.id === state.selectedItemId) || null; }
     function selectedNotice() { return state.notices.find(notice => notice.id === state.selectedNoticeId) || null; }
 
@@ -2264,6 +2466,12 @@
       $('categoryFilter').innerHTML = `<option value="all">전체 카테고리</option>${options}`;
       $('itemCategory').innerHTML = `${options}<option value="__custom__">직접입력</option>`;
       $('categoryFilter').value = state.selectedCategoryId;
+      const classDataActive = isMaterialCategory(state.selectedCategoryId);
+      $('libraryNavBtn').classList.toggle('active', classDataActive);
+      $('libraryDropdownBtn').classList.toggle('active', classDataActive);
+      $('categoryToolbar').querySelector('.category-toolbar-title strong').textContent = classDataActive ? 'Library' : '카테고리';
+      $('categoryToolbar').querySelector('.category-toolbar-title .muted').textContent = classDataActive ? '강사별 · 주차별 수업자료' : '질문 분류';
+      toggleDriveEmbedPanel(classDataActive);
     }
 
     function toggleCustomCategoryInput() {
@@ -2273,6 +2481,21 @@
       $('confirmCustomCategoryBtn').classList.toggle('hidden', !active);
       if (active) $('customCategoryName').focus();
       else $('customCategoryName').value = '';
+    }
+
+    function populateMaterialOptions() {
+      $('itemInstructor').innerHTML = INSTRUCTOR_LIST.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
+      $('itemWeek').innerHTML = Array.from({ length: 20 }, (_, index) => index + 1)
+        .map(week => `<option value="${week}주차">${week}주차</option>`).join('');
+    }
+
+    function toggleMaterialFields() {
+      const active = isMaterialCategory($('itemCategory').value);
+      $('materialInstructorField').style.display = active ? '' : 'none';
+      $('materialWeekField').style.display = active ? '' : 'none';
+      $('materialLinkField').style.display = active ? '' : 'none';
+      $('itemQuestionLabel').textContent = active ? '자료 제목' : '질문';
+      $('itemAnswerLabel').textContent = active ? '설명 (선택)' : '답변';
     }
 
     function confirmCustomCategory() {
@@ -2332,8 +2555,9 @@
 
     function renderIssueArchive() {
       const active = state.noticeListType === 'monthly' || state.noticeListType === 'weekly';
+      const libraryActive = isMaterialCategory(state.selectedCategoryId);
       $('categoryToolbar').classList.toggle('hidden', active);
-      $('questionListPanel').classList.toggle('hidden', active);
+      $('questionListPanel').classList.toggle('hidden', active || libraryActive);
       $('issueArchivePanel').classList.toggle('hidden', !active);
       if (!active) return;
       const rows = state.notices
@@ -2445,13 +2669,18 @@
       const start = (state.page - 1) * state.pageSize;
       const items = filtered.slice(start, start + state.pageSize);
       $('listInfo').textContent = filtered.length ? `${filtered.length}건 · ${state.page}/${totalPages}페이지` : '0건';
-      $('itemTableBody').innerHTML = items.length ? items.map(item => `
+      $('itemTableBody').innerHTML = items.length ? items.map(item => {
+        const material = isMaterialCategory(item.categoryId);
+        const questionLabel = material && item.week ? `[${escapeHtml(item.week)}] ${escapeHtml(item.question)}` : escapeHtml(item.question);
+        const authorLabel = material ? escapeHtml(item.instructor || '-') : escapeHtml(item.author || '-');
+        return `
         <tr data-item="${item.id}" class="${item.id === state.selectedItemId ? 'active' : ''}">
           <td>${escapeHtml(categoryName(item.categoryId))}</td>
-          <td>${escapeHtml(item.question)}</td>
-          <td>${escapeHtml(item.author || '-')}</td>
+          <td>${questionLabel}</td>
+          <td>${authorLabel}</td>
           <td class="col-date">${formatDate(item.createdAt)}</td>
-        </tr>`).join('') : '<tr><td colspan="4" class="empty">검색 결과가 없습니다.</td></tr>';
+        </tr>`;
+      }).join('') : '<tr><td colspan="4" class="empty">검색 결과가 없습니다.</td></tr>';
       document.querySelectorAll('[data-item]').forEach(row => row.onclick = () => {
         selectItem(row.dataset.item);
         $('viewerPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -2501,6 +2730,7 @@
           $('viewAnswerImage').removeAttribute('src');
         }
         $('viewerActions').classList.remove('hidden');
+        $('viewMaterialLink').classList.add('hidden');
         $('commentArea').classList.remove('hidden');
         renderComments(notice);
         return;
@@ -2517,16 +2747,29 @@
         $('viewMeta').innerHTML = '<span class="meta-author">작성자 -</span><span class="meta-created">작성일시 -</span><span class="meta-modified">최종 수정일시 -</span>';
         $('viewAnswerImage').classList.add('hidden');
         $('viewAnswerImage').removeAttribute('src');
+        $('viewMaterialLink').classList.add('hidden');
         $('commentList').innerHTML = '<div class="muted">질문을 선택하면 댓글이 표시됩니다.</div>';
         $('commentArea').classList.remove('hidden');
         return;
       }
+      const isMaterial = isMaterialCategory(item.categoryId);
+      $('viewQuestionLabel').textContent = isMaterial ? '자료' : 'Question';
+      $('viewAnswerLabel').textContent = isMaterial ? '설명' : 'Answer';
       $('viewQuestion').textContent = item.question;
       $('viewQuestion').classList.remove('viewer-empty');
-      $('viewAnswer').innerHTML = answerContentToHtml(item.answer);
-      $('viewAnswer').classList.remove('viewer-empty');
+      $('viewAnswer').innerHTML = answerContentToHtml(item.answer) || (isMaterial ? '' : '');
+      $('viewAnswer').classList.toggle('viewer-empty', !item.answer && !isMaterial);
+      if (isMaterial && item.materialUrl) {
+        $('viewMaterialLink').href = item.materialUrl;
+        $('viewMaterialLink').classList.remove('hidden');
+      } else {
+        $('viewMaterialLink').classList.add('hidden');
+        $('viewMaterialLink').removeAttribute('href');
+      }
       const finalModifiedAt = item.revisionHistory?.[item.revisionHistory.length - 1]?.at || item.updatedAt || item.createdAt;
-      $('viewMeta').innerHTML = `<span class="meta-author">작성자 ${escapeHtml(item.author || '-')}</span><span class="meta-created">작성일시 ${formatDate(item.createdAt)}</span><span class="meta-modified">최종 수정일시 ${formatDate(finalModifiedAt)}</span>`;
+      $('viewMeta').innerHTML = isMaterial
+        ? `<span class="meta-author">강사 ${escapeHtml(item.instructor || '-')}</span><span class="meta-week">주차 ${escapeHtml(item.week || '-')}</span><span class="meta-created">작성일시 ${formatDate(item.createdAt)}</span><span class="meta-modified">최종 수정일시 ${formatDate(finalModifiedAt)}</span>`
+        : `<span class="meta-author">작성자 ${escapeHtml(item.author || '-')}</span><span class="meta-created">작성일시 ${formatDate(item.createdAt)}</span><span class="meta-modified">최종 수정일시 ${formatDate(finalModifiedAt)}</span>`;
       if (item.imageData) {
         $('viewAnswerImage').src = item.imageData;
         $('viewAnswerImage').classList.remove('hidden');
@@ -2783,10 +3026,14 @@
       $('itemQuestion').value = '';
       $('itemAnswer').innerHTML = '';
       $('answerImageInput').value = '';
+      $('itemMaterialUrl').value = '';
+      if ($('itemInstructor').options.length) $('itemInstructor').selectedIndex = 0;
+      if ($('itemWeek').options.length) $('itemWeek').selectedIndex = 0;
       pendingImageData = '';
       updateAttachmentPreview();
       if (state.categories[0]) $('itemCategory').value = state.categories[0].id;
       toggleCustomCategoryInput();
+      toggleMaterialFields();
       $('editorStatus').textContent = '새 질문을 등록할 수 있습니다.';
       renderRevisionHistory(null);
       renderTable();
@@ -2802,9 +3049,13 @@
       $('editorTitle').textContent = 'Add FAQ';
       $('itemCategory').value = item.categoryId;
       toggleCustomCategoryInput();
+      toggleMaterialFields();
       $('editorName').value = item.author || '';
       $('itemQuestion').value = item.question;
       $('itemAnswer').innerHTML = answerContentToHtml(item.answer);
+      $('itemMaterialUrl').value = item.materialUrl || '';
+      if (item.instructor) $('itemInstructor').value = item.instructor;
+      if (item.week) $('itemWeek').value = item.week;
       $('answerImageInput').value = '';
       pendingImageData = item.imageData || '';
       updateAttachmentPreview();
@@ -3034,8 +3285,16 @@
       const question = $('itemQuestion').value.trim();
       let answer = sanitizeNoticeHtml($('itemAnswer').innerHTML).trim();
       const hasAnswer = $('itemAnswer').textContent.trim() || /<img\b/i.test(answer);
+      const isMaterial = isMaterialCategory(categoryId);
+      const instructor = isMaterial ? $('itemInstructor').value : '';
+      const week = isMaterial ? $('itemWeek').value : '';
+      const materialUrl = isMaterial ? $('itemMaterialUrl').value.trim() : '';
       if (categoryId === '__custom__') return alert('직접 입력한 카테고리를 먼저 추가해 주세요.');
-      if (!categoryId || !author || !question || !hasAnswer) return alert('카테고리, 작성자, 질문, 답변을 모두 입력해 주세요.');
+      if (isMaterial) {
+        if (!categoryId || !author || !question || !materialUrl) return alert('카테고리, 작성자, 자료 제목, 구글 드라이브 링크를 모두 입력해 주세요.');
+      } else if (!categoryId || !author || !question || !hasAnswer) {
+        return alert('카테고리, 작성자, 질문, 답변을 모두 입력해 주세요.');
+      }
       const now = nowISO();
       const itemId = state.selectedItemId || makeId('faq');
       $('saveItemBtn').disabled = true;
@@ -3052,9 +3311,9 @@
         if (state.selectedItemId) {
           const item = selectedItem();
           item.revisionHistory = [...(item.revisionHistory || [{ at: item.createdAt }]), { at: now }];
-          Object.assign(item, { categoryId, author, question, answer, imageData, imagePath, updatedAt: now });
+          Object.assign(item, { categoryId, author, question, answer, imageData, imagePath, instructor, week, materialUrl, updatedAt: now });
         } else {
-          const item = { id: itemId, categoryId, author, question, answer, imageData, imagePath, createdAt: now, updatedAt: now, comments: [], revisionHistory: [{ at: now }] };
+          const item = { id: itemId, categoryId, author, question, answer, imageData, imagePath, instructor, week, materialUrl, createdAt: now, updatedAt: now, comments: [], revisionHistory: [{ at: now }] };
           state.items.unshift(item);
           state.selectedItemId = item.id;
         }
@@ -3431,7 +3690,7 @@
     };
     $('addFaqBtnMobile').onclick = () => $('addFaqBtn').click();
     $('saveItemBtn').onclick = saveItem;
-    $('itemCategory').addEventListener('change', toggleCustomCategoryInput);
+    $('itemCategory').addEventListener('change', () => { toggleCustomCategoryInput(); toggleMaterialFields(); });
     $('confirmCustomCategoryBtn').onclick = confirmCustomCategory;
     $('customCategoryName').addEventListener('keydown', event => {
       if (event.key === 'Enter') {
@@ -3455,7 +3714,37 @@
     $('removeImageBtn').onclick = () => { pendingImageData = ''; $('answerImageInput').value = ''; updateAttachmentPreview(); };
     $('expandEditorBtn').onclick = () => toggleEditorSize();
     $('editorBackdrop').onclick = () => toggleEditorSize(true);
-    $('homeBrandBtn').onclick = goHome;
+    function openLibraryView() {
+      ensureMaterialCategory();
+      state.noticeListType = null;
+      state.search = '';
+      state.selectedCategoryId = materialCategoryId();
+      state.selectedItemId = null;
+      state.selectedNoticeId = null;
+      state.page = 1;
+      state.archivePage = 1;
+      $('searchInput').value = '';
+      showBrowseMode(false);
+      renderAll();
+      $('categoryToolbar').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function isMobileGnb() { return window.matchMedia('(max-width: 980px)').matches; }
+    function openGnbDropdown() { $('gnbDropdownMenu').classList.remove('hidden'); $('gnbDropdownCaret').textContent = '▴'; }
+    function closeGnbDropdown() { $('gnbDropdownMenu').classList.add('hidden'); $('gnbDropdownCaret').textContent = '▾'; }
+    function toggleGnbDropdown() { $('gnbDropdownMenu').classList.contains('hidden') ? openGnbDropdown() : closeGnbDropdown(); }
+
+    $('homeBrandBtn').onclick = event => {
+      if (isMobileGnb()) { event.preventDefault(); toggleGnbDropdown(); return; }
+      goHome();
+    };
+    $('libraryNavBtn').onclick = openLibraryView;
+    $('homeDropdownBtn').onclick = () => { closeGnbDropdown(); goHome(); };
+    $('libraryDropdownBtn').onclick = () => { closeGnbDropdown(); openLibraryView(); };
+    document.addEventListener('click', event => {
+      if (!$('gnbBrandWrap').contains(event.target)) closeGnbDropdown();
+    });
+    window.addEventListener('resize', () => { if (!isMobileGnb()) closeGnbDropdown(); });
     $('viewerEditBtn').onclick = editSelectedContent;
     $('viewerDeleteBtn').onclick = deleteSelectedContent;
     $('addCommentBtn').onclick = addComment;
@@ -3498,6 +3787,8 @@
 
     async function init() {
       applyTheme(localStorage.getItem(THEME_STORAGE) || 'light');
+      $('driveEmbedOpenLink').href = DRIVE_FOLDER_URL;
+      populateMaterialOptions();
       loadLocalData();
       renderAll();
       loadData();

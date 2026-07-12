@@ -961,8 +961,8 @@
       }
       .gnb-brand { grid-column: 1; grid-row: 1; }
       .gnb-brand-wrap { grid-column: 1; grid-row: 1; }
-      .gnb-nav-sep, .gnb-nav-link { display: none; }
-      .gnb-dropdown-caret { display: inline-block; }
+      .gnb-nav-sep, .gnb-nav-link { display: none !important; }
+      .gnb-dropdown-caret { display: none; }
       .gnb-actions { grid-column: 2; grid-row: 1; justify-content: flex-end; gap: 6px; }
       .gnb-search { grid-column: 1 / -1; grid-row: 2; }
       .gnb-search input { flex: 1; min-width: 0; }
@@ -1659,7 +1659,7 @@
     <div class="app">
     <header class="gnb">
       <div class="gnb-brand-wrap" id="gnbBrandWrap">
-        <button class="gnb-brand" id="homeBrandBtn" type="button" aria-label="첫 화면으로 이동"><img src="./mexx_white.png" alt="MEXX"><span></span><strong>Team Playbook</strong><span class="gnb-dropdown-caret" id="gnbDropdownCaret">▾</span></button>
+        <button class="gnb-brand" id="homeBrandBtn" type="button" aria-label="첫 화면으로 이동"><img src="./mexx_white.png" alt="MEXX"><span></span><strong id="gnbBrandLabel">Team Playbook</strong><span class="gnb-dropdown-caret" id="gnbDropdownCaret">▾</span></button>
         <span class="gnb-nav-sep" aria-hidden="true">|</span>
         <button class="gnb-nav-link" id="libraryNavBtn" type="button">Library</button>
         <div class="gnb-dropdown hidden" id="gnbDropdownMenu">
@@ -1673,12 +1673,12 @@
       </div>
       <div class="gnb-actions">
         <button class="btn btn-primary gnb-faq-desktop" id="addFaqBtn" type="button">FAQ추가</button>
-        <button class="btn btn-secondary settings-button" id="settingsBtn" type="button" aria-label="설정 열기"><span class="btn-icon">⚙︎</span><span class="btn-text">설정</span></button>
-        <button class="btn btn-secondary theme-toggle" id="themeToggleBtn" type="button" aria-label="화면 테마 변경"><span class="btn-icon" id="themeIcon">🌙</span><span class="btn-text" id="themeLabel">다크</span></button>
+        <button class="btn btn-secondary settings-button" id="settingsBtn" type="button" aria-label="설정 열기"><span class="btn-icon"><svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="3" y1="6" x2="17" y2="6"/><circle cx="12" cy="6" r="2" fill="currentColor" stroke="none"/><line x1="3" y1="14" x2="17" y2="14"/><circle cx="8" cy="14" r="2" fill="currentColor" stroke="none"/></svg></span><span class="btn-text">설정</span></button>
+        <button class="btn btn-secondary theme-toggle" id="themeToggleBtn" type="button" aria-label="화면 테마 변경"><span class="btn-icon" id="themeIcon"><svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M13.5 2.5a7.5 7.5 0 1 0 4 13.9A9 9 0 0 1 13.5 2.5z"/></svg></span><span class="btn-text" id="themeLabel">다크</span></button>
       </div>
     </header>
 
-    <aside class="panel sidebar">
+    <aside class="panel sidebar" id="sidebarPanel">
       <button class="calendar-card" id="calendarCardBtn" type="button" aria-label="오늘 주요 일정 열기">
         <div class="mini-calendar-head">
           <span class="calendar-nav" data-calendar-nav="-1" aria-hidden="true">‹</span>
@@ -2080,11 +2080,14 @@
     let supabaseSdkPromise = null;
     let syncQueue = Promise.resolve();
 
+    const MOON_ICON_SVG = '<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M13.5 2.5a7.5 7.5 0 1 0 4 13.9A9 9 0 0 1 13.5 2.5z"/></svg>';
+    const SUN_ICON_SVG = '<svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10" cy="10" r="4"/><line x1="10" y1="1.5" x2="10" y2="3.5"/><line x1="10" y1="16.5" x2="10" y2="18.5"/><line x1="1.5" y1="10" x2="3.5" y2="10"/><line x1="16.5" y1="10" x2="18.5" y2="10"/><line x1="4" y1="4" x2="5.4" y2="5.4"/><line x1="14.6" y1="14.6" x2="16" y2="16"/><line x1="4" y1="16" x2="5.4" y2="14.6"/><line x1="14.6" y1="5.4" x2="16" y2="4"/></svg>';
+
     function applyTheme(theme) {
       const nextTheme = theme === 'dark' ? 'dark' : 'light';
       document.documentElement.dataset.theme = nextTheme;
       $('themeLabel').textContent = nextTheme === 'dark' ? '라이트' : '다크';
-      $('themeIcon').textContent = nextTheme === 'dark' ? '☀︎' : '🌙';
+      $('themeIcon').innerHTML = nextTheme === 'dark' ? SUN_ICON_SVG : MOON_ICON_SVG;
       $('themeToggleBtn').setAttribute('aria-pressed', String(nextTheme === 'dark'));
     }
 
@@ -2485,6 +2488,7 @@
       $('categoryToolbar').querySelector('.category-toolbar-title strong').textContent = classDataActive ? 'Library' : '카테고리';
       $('categoryToolbar').querySelector('.category-toolbar-title .muted').textContent = classDataActive ? '강사별 · 주차별 수업자료' : '질문 분류';
       toggleDriveEmbedPanel(classDataActive);
+      updateGnbBrandState(classDataActive);
     }
 
     function toggleCustomCategoryInput() {
@@ -3743,6 +3747,24 @@
     }
 
     function isMobileGnb() { return window.matchMedia('(max-width: 980px)').matches; }
+
+    function updateGnbBrandState(classDataActive = isMaterialCategory(state.selectedCategoryId)) {
+      const mobile = isMobileGnb();
+      $('gnbBrandLabel').textContent = (mobile && classDataActive) ? 'Library' : 'Team Playbook';
+      $('libraryDropdownBtn').classList.toggle('hidden', mobile && classDataActive);
+      $('homeDropdownBtn').classList.toggle('hidden', !(mobile && classDataActive));
+      $('sidebarPanel').classList.toggle('hidden', mobile && classDataActive);
+    }
+
+    function applyDefaultCalendarState() {
+      const collapsed = isMobileGnb();
+      $('calendarCardBtn').classList.toggle('search-collapsed', collapsed);
+      $('calendarToggleBtn').classList.toggle('hidden', !collapsed);
+      $('calendarToggleIcon').textContent = collapsed ? '▼' : '▲';
+    }
+    const mobileGnbQuery = window.matchMedia('(max-width: 980px)');
+    mobileGnbQuery.addEventListener('change', () => { applyDefaultCalendarState(); updateGnbBrandState(); });
+
     function openGnbDropdown() { $('gnbDropdownMenu').classList.remove('hidden'); $('gnbDropdownCaret').textContent = '▴'; }
     function closeGnbDropdown() { $('gnbDropdownMenu').classList.add('hidden'); $('gnbDropdownCaret').textContent = '▾'; }
     function toggleGnbDropdown() { $('gnbDropdownMenu').classList.contains('hidden') ? openGnbDropdown() : closeGnbDropdown(); }
@@ -3804,6 +3826,7 @@
       populateMaterialOptions();
       loadLocalData();
       renderAll();
+      applyDefaultCalendarState();
       loadData();
     }
     init();

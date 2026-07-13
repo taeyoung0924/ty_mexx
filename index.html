@@ -1628,6 +1628,29 @@
       border-radius: 2px;
     }
 </style>
+
+  <style>
+    /* 목록 및 결과 영역 가로폭 확장 */
+    @media (min-width: 981px) {
+      .app {
+        width: min(100%, 1480px);
+        grid-template-columns: minmax(240px, 280px) minmax(0, 1fr);
+      }
+
+      .gnb {
+        padding-left: max(22px, calc((100vw - 1480px) / 2 + 22px));
+        padding-right: max(22px, calc((100vw - 1480px) / 2 + 22px));
+        grid-template-columns: minmax(220px, 280px) minmax(320px, 600px) auto;
+      }
+
+      .list-panel,
+      .viewer {
+        width: 100%;
+        max-width: none;
+      }
+    }
+  </style>
+
 </head>
 <body>
     <div class="app">

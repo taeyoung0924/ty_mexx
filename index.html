@@ -1575,6 +1575,58 @@
       }
     }
 
+
+
+    /* FAQ answer typography and formatting toolbar */
+    .viewer-answer-text {
+      white-space: normal;
+      line-height: 1.65;
+    }
+    .viewer-answer-text p,
+    .viewer-answer-text div {
+      margin: 0 0 8px;
+      line-height: 1.65;
+    }
+    .viewer-answer-text p:last-child,
+    .viewer-answer-text div:last-child { margin-bottom: 0; }
+    .viewer-answer-text p:empty,
+    .viewer-answer-text div:empty {
+      min-height: 8px;
+      margin: 0;
+    }
+    .viewer-answer-text mark,
+    .faq-answer-editor mark {
+      padding: 0 .12em;
+      color: inherit;
+      background: #fff39a;
+      border-radius: 2px;
+    }
+    .editor-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .editor-tool-btn {
+      min-width: 34px;
+      min-height: 28px;
+      padding: 4px 9px;
+      color: var(--text);
+      background: var(--input);
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      font-weight: 700;
+    }
+    .editor-tool-btn:hover {
+      color: var(--primary);
+      border-color: var(--interactive-line);
+      box-shadow: none;
+    }
+    .highlight-tool-icon {
+      padding: 0 2px;
+      background: #fff39a;
+      border-radius: 2px;
+    }
 </style>
 </head>
 <body>
@@ -1721,7 +1773,7 @@
         </div>
         <div class="field"><label for="editorName">작성자</label><input type="text" id="editorName" placeholder="이름"></div>
         <div class="field"><label for="itemQuestion">질문</label><textarea id="itemQuestion" rows="2" placeholder="질문을 입력하세요"></textarea></div>
-        <div class="field"><label for="itemAnswer">답변</label><div class="rich-editor faq-answer-editor" id="itemAnswer" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="답변을 입력하세요"></div><span class="muted">답변 입력창에 이미지를 붙여넣으면 커서 위치에 이미지가 들어갑니다.</span></div>
+        <div class="field"><label for="itemAnswer">답변</label><div class="editor-toolbar" role="toolbar" aria-label="답변 서식"><button class="editor-tool-btn" type="button" id="answerBoldBtn" title="굵게"><strong>B</strong></button><button class="editor-tool-btn" type="button" id="answerHighlightBtn" title="형광색 칠하기"><span class="highlight-tool-icon">형광</span></button></div><div class="rich-editor faq-answer-editor" id="itemAnswer" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="답변을 입력하세요"></div><span class="muted">텍스트를 선택해 굵게 또는 형광색을 적용할 수 있으며, 이미지를 붙여넣으면 커서 위치에 들어갑니다.</span></div>
         <div class="field">
           <label for="answerImageInput">답변 이미지 첨부</label>
           <input type="file" id="answerImageInput" accept="image/*">
@@ -1896,7 +1948,7 @@
     const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));
 
     function sanitizeNoticeHtml(html) {
-      const allowed = new Set(['DIV', 'P', 'BR', 'IMG', 'B', 'STRONG', 'I', 'EM', 'U', 'UL', 'OL', 'LI']);
+      const allowed = new Set(['DIV', 'P', 'BR', 'IMG', 'B', 'STRONG', 'I', 'EM', 'U', 'UL', 'OL', 'LI', 'MARK']);
       const source = document.createElement('div');
       const output = document.createElement('div');
       source.innerHTML = String(html || '');
@@ -1926,7 +1978,7 @@
 
     function noticeContentToHtml(content) {
       const value = String(content || '');
-      const hasRichMarkup = /<(div|p|br|img|b|strong|i|em|u|ul|ol|li)\b/i.test(value);
+      const hasRichMarkup = /<(div|p|br|img|b|strong|i|em|u|ul|ol|li|mark)\b/i.test(value);
       return sanitizeNoticeHtml(hasRichMarkup ? value : escapeHtml(value).replace(/\r?\n/g, '<br>'));
     }
 
@@ -3444,6 +3496,45 @@
       if (!file) return;
       attachImageFile(file);
     });
+    function applyAnswerBold() {
+      const editor = $('itemAnswer');
+      editor.focus();
+      document.execCommand('bold', false, null);
+    }
+
+    function applyAnswerHighlight() {
+      const editor = $('itemAnswer');
+      const selection = window.getSelection();
+      if (!selection || !selection.rangeCount || selection.isCollapsed) {
+        alert('형광색을 적용할 텍스트를 먼저 선택해 주세요.');
+        return;
+      }
+      const range = selection.getRangeAt(0);
+      if (!editor.contains(range.commonAncestorContainer)) {
+        alert('답변 입력창 안의 텍스트를 선택해 주세요.');
+        return;
+      }
+      const mark = document.createElement('mark');
+      try {
+        range.surroundContents(mark);
+      } catch (error) {
+        const fragment = range.extractContents();
+        mark.appendChild(fragment);
+        range.insertNode(mark);
+      }
+      selection.removeAllRanges();
+      const nextRange = document.createRange();
+      nextRange.selectNodeContents(mark);
+      selection.addRange(nextRange);
+      editor.focus();
+    }
+
+    ['answerBoldBtn', 'answerHighlightBtn'].forEach(id => {
+      $(id).addEventListener('mousedown', event => event.preventDefault());
+    });
+    $('answerBoldBtn').onclick = applyAnswerBold;
+    $('answerHighlightBtn').onclick = applyAnswerHighlight;
+
     $('itemAnswer').addEventListener('paste', event => {
       const imageItem = [...(event.clipboardData?.items || [])].find(item => item.type.startsWith('image/'));
       if (!imageItem) return;

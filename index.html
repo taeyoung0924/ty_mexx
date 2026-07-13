@@ -1855,6 +1855,31 @@
     }
   </style>
 
+
+  <style>
+    .align-tool-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .align-tool-btn {
+      min-width: 31px;
+      width: 31px;
+      padding: 0;
+      font-size: 16px;
+      line-height: 1;
+      font-weight: 700;
+      overflow: hidden;
+    }
+    .align-tool-btn[data-align="left"] { text-align: left; padding-left: 6px; }
+    .align-tool-btn[data-align="center"] { text-align: center; }
+    .align-tool-btn[data-align="right"] { text-align: right; padding-right: 6px; }
+
+    .text-align-left { text-align: left !important; }
+    .text-align-center { text-align: center !important; }
+    .text-align-right { text-align: right !important; }
+  </style>
+
 </head>
 <body>
     <div class="app">
@@ -2017,6 +2042,12 @@
             <button class="text-color-btn" type="button" data-text-color="green" data-color="green" title="초록색"></button>
             <button class="text-color-btn" type="button" data-text-color="orange" data-color="orange" title="주황색"></button>
             <button class="text-color-btn" type="button" data-text-color="gray" data-color="gray" title="회색"></button>
+          </span>
+          <span class="editor-toolbar-divider" aria-hidden="true"></span>
+          <span class="align-tool-group" aria-label="문단 정렬">
+            <button class="editor-tool-btn align-tool-btn" type="button" data-align="left" title="왼쪽 정렬" aria-label="왼쪽 정렬">≡</button>
+            <button class="editor-tool-btn align-tool-btn" type="button" data-align="center" title="가운데 정렬" aria-label="가운데 정렬">≡</button>
+            <button class="editor-tool-btn align-tool-btn" type="button" data-align="right" title="오른쪽 정렬" aria-label="오른쪽 정렬">≡</button>
           </span>
         </div><div class="rich-editor faq-answer-editor" id="itemAnswer" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="답변을 입력하세요"></div><span class="muted">텍스트를 선택해 굵게·형광색·글자 크기·글자 색상을 적용할 수 있습니다. 인터넷 주소는 저장 후 자동으로 링크가 됩니다.</span></div>
         <div class="field">
@@ -2227,9 +2258,14 @@
         if (node.tagName === 'SPAN') {
           const safeClasses = [...node.classList].filter(name =>
             /^text-size-[1-5]$/.test(name) ||
-            /^text-color-(red|blue|green|orange|gray)$/.test(name)
+            /^text-color-(red|blue|green|orange|gray)$/.test(name) ||
+            /^text-align-(left|center|right)$/.test(name)
           );
           if (safeClasses.length) clean.className = safeClasses.join(' ');
+        }
+        if (['DIV', 'P'].includes(node.tagName)) {
+          const alignClass = [...node.classList].find(name => /^text-align-(left|center|right)$/.test(name));
+          if (alignClass) clean.className = alignClass;
         }
         if (node.tagName === 'A') {
           const href = node.getAttribute('href') || '';
@@ -3880,6 +3916,31 @@
       document.body.classList.remove('image-lightbox-open');
     }
 
+    function applyAnswerAlignment(alignment) {
+      const editor = $('itemAnswer');
+      const selection = window.getSelection();
+
+      if (!selection || !selection.rangeCount) {
+        editor.focus();
+        document.execCommand(`justify${alignment.charAt(0).toUpperCase() + alignment.slice(1)}`, false, null);
+        return;
+      }
+
+      let node = selection.anchorNode;
+      if (node?.nodeType === Node.TEXT_NODE) node = node.parentElement;
+      let block = node?.closest?.('div, p, li');
+
+      if (!block || !editor.contains(block)) {
+        document.execCommand(`justify${alignment.charAt(0).toUpperCase() + alignment.slice(1)}`, false, null);
+        editor.focus();
+        return;
+      }
+
+      block.classList.remove('text-align-left', 'text-align-center', 'text-align-right');
+      block.classList.add(`text-align-${alignment}`);
+      editor.focus();
+    }
+
     function applyAnswerTextColor(colorName) {
       const selected = getAnswerSelectionRange();
       if (!selected) return;
@@ -3943,6 +4004,10 @@
     document.querySelectorAll('[data-text-color]').forEach(button => {
       button.addEventListener('mousedown', event => event.preventDefault());
       button.onclick = () => applyAnswerTextColor(button.dataset.textColor);
+    });
+    document.querySelectorAll('[data-align]').forEach(button => {
+      button.addEventListener('mousedown', event => event.preventDefault());
+      button.onclick = () => applyAnswerAlignment(button.dataset.align);
     });
 
     $('viewerPanel').addEventListener('click', event => {

@@ -2041,6 +2041,15 @@
   </section>
 
   <script src="./supabase-config.js"></script>
+
+  <div class="image-lightbox hidden" id="imageLightbox" role="dialog" aria-modal="true" aria-label="원본 이미지 보기">
+    <button type="button" class="image-lightbox-close" id="imageLightboxClose" aria-label="닫기">×</button>
+    <div class="image-lightbox-stage">
+      <img id="imageLightboxImage" alt="원본 이미지">
+    </div>
+    <div class="image-lightbox-hint">이미지 바깥 영역 또는 × 버튼을 누르면 닫힙니다.</div>
+  </div>
+
   <script>
     const STORAGE = 'rsdc_faq_items_v2';
     const CATEGORY_STORAGE = 'rsdc_faq_categories_v2';
@@ -3800,14 +3809,6 @@
     }
     init();
   </script>
-
-  <div class="image-lightbox hidden" id="imageLightbox" role="dialog" aria-modal="true" aria-label="원본 이미지 보기">
-    <button type="button" class="image-lightbox-close" id="imageLightboxClose" aria-label="닫기">×</button>
-    <div class="image-lightbox-stage">
-      <img id="imageLightboxImage" alt="원본 이미지">
-    </div>
-    <div class="image-lightbox-hint">이미지 바깥 영역 또는 × 버튼을 누르면 닫힙니다.</div>
-  </div>
 
 </body>
 </html>

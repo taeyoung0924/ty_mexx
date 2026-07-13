@@ -1746,6 +1746,115 @@
     }
   </style>
 
+
+  <style>
+    /* FAQ editor enhancements */
+    #itemAnswer.faq-answer-editor {
+      min-height: 420px;
+      height: 420px;
+    }
+    .question-important-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: end;
+    }
+    .important-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 58px;
+      padding: 0 12px;
+      color: var(--text);
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .important-check input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      accent-color: var(--primary);
+    }
+    .important-title {
+      font-weight: 800 !important;
+    }
+    .important-badge {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 6px;
+      padding: 2px 6px;
+      color: #b42318;
+      background: #fff1f0;
+      border: 1px solid #ffd5d2;
+      border-radius: 999px;
+      font-size: 7.5pt;
+      font-weight: 800;
+      vertical-align: 1px;
+    }
+    :root[data-theme="dark"] .important-badge {
+      color: #ffaaa2;
+      background: rgba(180,35,24,.18);
+      border-color: rgba(255,170,162,.25);
+    }
+    .color-tool-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .text-color-btn {
+      width: 27px;
+      min-width: 27px;
+      height: 27px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 3px #fff;
+      font-size: 0;
+    }
+    :root[data-theme="dark"] .text-color-btn {
+      box-shadow: inset 0 0 0 3px #172033;
+    }
+    .text-color-btn[data-color="red"] { background: #d92d20; }
+    .text-color-btn[data-color="blue"] { background: #2563eb; }
+    .text-color-btn[data-color="green"] { background: #15803d; }
+    .text-color-btn[data-color="orange"] { background: #ea580c; }
+    .text-color-btn[data-color="gray"] { background: #475467; }
+
+    .text-color-red { color: #d92d20 !important; }
+    .text-color-blue { color: #2563eb !important; }
+    .text-color-green { color: #15803d !important; }
+    .text-color-orange { color: #ea580c !important; }
+    .text-color-gray { color: #475467 !important; }
+
+    .viewer-answer-text a,
+    .faq-answer-editor a {
+      color: #2563eb;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      overflow-wrap: anywhere;
+    }
+    :root[data-theme="dark"] .viewer-answer-text a,
+    :root[data-theme="dark"] .faq-answer-editor a {
+      color: #8fb4ff;
+    }
+
+    @media (max-width: 640px) {
+      #itemAnswer.faq-answer-editor {
+        min-height: 340px;
+        height: 340px;
+      }
+      .question-important-row {
+        grid-template-columns: 1fr;
+      }
+      .important-check {
+        min-height: 38px;
+      }
+    }
+  </style>
+
 </head>
 <body>
     <div class="app">
@@ -1890,8 +1999,26 @@
           </div>
         </div>
         <div class="field"><label for="editorName">작성자</label><input type="text" id="editorName" placeholder="이름"></div>
-        <div class="field"><label for="itemQuestion">질문</label><textarea id="itemQuestion" rows="2" placeholder="질문을 입력하세요"></textarea></div>
-        <div class="field"><label for="itemAnswer">답변</label><div class="editor-toolbar" role="toolbar" aria-label="답변 서식"><button class="editor-tool-btn" type="button" id="answerBoldBtn" title="굵게"><strong>B</strong></button><button class="editor-tool-btn" type="button" id="answerHighlightBtn" title="형광색 칠하기"><span class="highlight-tool-icon">형광</span></button><span class="editor-toolbar-divider" aria-hidden="true"></span><button class="editor-tool-btn font-size-tool" type="button" id="answerFontDownBtn" title="선택한 글자 작게" aria-label="글자 작게">A−</button><button class="editor-tool-btn font-size-tool" type="button" id="answerFontUpBtn" title="선택한 글자 크게" aria-label="글자 크게">A＋</button></div><div class="rich-editor faq-answer-editor" id="itemAnswer" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="답변을 입력하세요"></div><span class="muted">텍스트를 선택해 굵게·형광색·글자 크기를 적용할 수 있으며, 이미지를 붙여넣으면 커서 위치에 들어갑니다.</span></div>
+        <div class="field">
+          <label for="itemQuestion">질문</label>
+          <div class="question-important-row">
+            <textarea id="itemQuestion" rows="2" placeholder="질문을 입력하세요"></textarea>
+            <label class="important-check" for="itemImportant">
+              <input type="checkbox" id="itemImportant">
+              <span>중요</span>
+            </label>
+          </div>
+        </div>
+        <div class="field"><label for="itemAnswer">답변</label><div class="editor-toolbar" role="toolbar" aria-label="답변 서식"><button class="editor-tool-btn" type="button" id="answerBoldBtn" title="굵게"><strong>B</strong></button><button class="editor-tool-btn" type="button" id="answerHighlightBtn" title="형광색 칠하기"><span class="highlight-tool-icon">형광</span></button><span class="editor-toolbar-divider" aria-hidden="true"></span><button class="editor-tool-btn font-size-tool" type="button" id="answerFontDownBtn" title="선택한 글자 작게" aria-label="글자 작게">A−</button><button class="editor-tool-btn font-size-tool" type="button" id="answerFontUpBtn" title="선택한 글자 크게" aria-label="글자 크게">A＋</button>
+          <span class="editor-toolbar-divider" aria-hidden="true"></span>
+          <span class="color-tool-group" aria-label="글자 색상">
+            <button class="text-color-btn" type="button" data-text-color="red" data-color="red" title="빨간색"></button>
+            <button class="text-color-btn" type="button" data-text-color="blue" data-color="blue" title="파란색"></button>
+            <button class="text-color-btn" type="button" data-text-color="green" data-color="green" title="초록색"></button>
+            <button class="text-color-btn" type="button" data-text-color="orange" data-color="orange" title="주황색"></button>
+            <button class="text-color-btn" type="button" data-text-color="gray" data-color="gray" title="회색"></button>
+          </span>
+        </div><div class="rich-editor faq-answer-editor" id="itemAnswer" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="답변을 입력하세요"></div><span class="muted">텍스트를 선택해 굵게·형광색·글자 크기·글자 색상을 적용할 수 있습니다. 인터넷 주소는 저장 후 자동으로 링크가 됩니다.</span></div>
         <div class="field">
           <label for="answerImageInput">답변 이미지 첨부</label>
           <input type="file" id="answerImageInput" accept="image/*">
@@ -2058,6 +2185,7 @@
     const SCHEDULE_STORAGE = 'rsdc_faq_schedules_v1';
     const SUPABASE_SDK_URL = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
     const THEME_STORAGE = 'rsdc_faq_theme_v1';
+    const IMPORTANT_PREFIX = '[[IMPORTANT]]';
     const $ = id => document.getElementById(id);
     const makeId = prefix => `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     const nowISO = () => new Date().toISOString();
@@ -2075,7 +2203,7 @@
     const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));
 
     function sanitizeNoticeHtml(html) {
-      const allowed = new Set(['DIV', 'P', 'BR', 'IMG', 'B', 'STRONG', 'I', 'EM', 'U', 'UL', 'OL', 'LI', 'MARK', 'SPAN']);
+      const allowed = new Set(['DIV', 'P', 'BR', 'IMG', 'B', 'STRONG', 'I', 'EM', 'U', 'UL', 'OL', 'LI', 'MARK', 'SPAN', 'A']);
       const source = document.createElement('div');
       const output = document.createElement('div');
       source.innerHTML = String(html || '');
@@ -2097,8 +2225,18 @@
           return clean;
         }
         if (node.tagName === 'SPAN') {
-          const safeSizeClass = [...node.classList].find(name => /^text-size-[1-5]$/.test(name));
-          if (safeSizeClass) clean.className = safeSizeClass;
+          const safeClasses = [...node.classList].filter(name =>
+            /^text-size-[1-5]$/.test(name) ||
+            /^text-color-(red|blue|green|orange|gray)$/.test(name)
+          );
+          if (safeClasses.length) clean.className = safeClasses.join(' ');
+        }
+        if (node.tagName === 'A') {
+          const href = node.getAttribute('href') || '';
+          if (!/^https?:\/\//i.test(href)) return fragment;
+          clean.setAttribute('href', href);
+          clean.setAttribute('target', '_blank');
+          clean.setAttribute('rel', 'noopener noreferrer');
         }
         [...node.childNodes].forEach(child => clean.appendChild(copySafeNode(child)));
         return clean;
@@ -2109,12 +2247,51 @@
 
     function noticeContentToHtml(content) {
       const value = String(content || '');
-      const hasRichMarkup = /<(div|p|br|img|b|strong|i|em|u|ul|ol|li|mark|span)\b/i.test(value);
+      const hasRichMarkup = /<(div|p|br|img|b|strong|i|em|u|ul|ol|li|mark|span|a)\b/i.test(value);
       return sanitizeNoticeHtml(hasRichMarkup ? value : escapeHtml(value).replace(/\r?\n/g, '<br>'));
     }
 
+    function linkifyHtml(html) {
+      const container = document.createElement('div');
+      container.innerHTML = html;
+      const urlPattern = /((https?:\/\/|www\.)[^\s<]+)/gi;
+      const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+      const textNodes = [];
+      while (walker.nextNode()) {
+        const node = walker.currentNode;
+        if (!node.parentElement?.closest('a, script, style')) textNodes.push(node);
+      }
+      textNodes.forEach(node => {
+        const value = node.nodeValue || '';
+        if (!urlPattern.test(value)) {
+          urlPattern.lastIndex = 0;
+          return;
+        }
+        urlPattern.lastIndex = 0;
+        const fragment = document.createDocumentFragment();
+        let lastIndex = 0;
+        value.replace(urlPattern, (match, _full, _scheme, offset) => {
+          const trailing = match.match(/[),.!?;:]+$/)?.[0] || '';
+          const cleanUrl = trailing ? match.slice(0, -trailing.length) : match;
+          fragment.appendChild(document.createTextNode(value.slice(lastIndex, offset)));
+          const anchor = document.createElement('a');
+          anchor.href = /^www\./i.test(cleanUrl) ? `https://${cleanUrl}` : cleanUrl;
+          anchor.target = '_blank';
+          anchor.rel = 'noopener noreferrer';
+          anchor.textContent = cleanUrl;
+          fragment.appendChild(anchor);
+          if (trailing) fragment.appendChild(document.createTextNode(trailing));
+          lastIndex = offset + match.length;
+          return match;
+        });
+        fragment.appendChild(document.createTextNode(value.slice(lastIndex)));
+        node.replaceWith(fragment);
+      });
+      return container.innerHTML;
+    }
+
     function answerContentToHtml(content) {
-      return noticeContentToHtml(content);
+      return linkifyHtml(noticeContentToHtml(content));
     }
 
     function htmlToPlainText(content) {
@@ -2191,7 +2368,10 @@
       if (item.updatedAt && item.updatedAt !== item.createdAt && !revisionHistory.some(entry => entry.at === item.updatedAt)) {
         revisionHistory.push({ at: item.updatedAt });
       }
-      return { ...item, comments: item.comments || [], imageData: item.imageData || '', imagePath: item.imagePath || '', revisionHistory };
+      const rawQuestion = String(item.question || '');
+      const important = Boolean(item.important) || rawQuestion.startsWith(IMPORTANT_PREFIX);
+      const question = rawQuestion.startsWith(IMPORTANT_PREFIX) ? rawQuestion.slice(IMPORTANT_PREFIX.length) : rawQuestion;
+      return { ...item, question, important, comments: item.comments || [], imageData: item.imageData || '', imagePath: item.imagePath || '', revisionHistory };
     }
 
     function loadLocalData() {
@@ -2252,7 +2432,8 @@
       return normalizeItem({
         id: row.id,
         categoryId: row.category_id || '',
-        question: row.question,
+        question: String(row.question || '').startsWith(IMPORTANT_PREFIX) ? String(row.question || '').slice(IMPORTANT_PREFIX.length) : row.question,
+        important: String(row.question || '').startsWith(IMPORTANT_PREFIX),
         answer: row.answer,
         author: row.author,
         imageData: row.image_url || '',
@@ -2268,7 +2449,7 @@
       return {
         id: item.id,
         category_id: item.categoryId || null,
-        question: item.question,
+        question: item.important ? `${IMPORTANT_PREFIX}${item.question}` : item.question,
         answer: item.answer,
         author: item.author,
         image_url: item.imageData || null,
@@ -2631,7 +2812,7 @@
       $('itemTableBody').innerHTML = items.length ? items.map(item => `
         <tr data-item="${item.id}" class="${item.id === state.selectedItemId ? 'active' : ''}">
           <td>${escapeHtml(categoryName(item.categoryId))}</td>
-          <td>${escapeHtml(item.question)}</td>
+          <td class="${item.important ? 'important-title' : ''}">${item.important ? '<span class="important-badge">중요</span>' : ''}${escapeHtml(item.question)}</td>
           <td>${escapeHtml(item.author || '-')}</td>
           <td class="col-date">${formatDate(item.createdAt)}</td>
         </tr>`).join('') : '<tr><td colspan="4" class="empty">검색 결과가 없습니다.</td></tr>';
@@ -2695,6 +2876,7 @@
       if (!item) {
         $('viewQuestion').textContent = '위 목록에서 질문을 선택해 주세요.';
         $('viewQuestion').classList.add('viewer-empty');
+        $('viewQuestion').classList.remove('important-title');
         $('viewAnswer').textContent = '선택한 질문의 답변이 여기에 표시됩니다.';
         $('viewAnswer').classList.add('viewer-empty');
         $('viewMeta').innerHTML = '<span class="meta-author">작성자 -</span><span class="meta-created">작성일시 -</span><span class="meta-modified">최종 수정일시 -</span>';
@@ -2706,6 +2888,7 @@
       }
       $('viewQuestion').textContent = item.question;
       $('viewQuestion').classList.remove('viewer-empty');
+      $('viewQuestion').classList.toggle('important-title', Boolean(item.important));
       $('viewAnswer').innerHTML = answerContentToHtml(item.answer);
       $('viewAnswer').classList.remove('viewer-empty');
       const finalModifiedAt = item.revisionHistory?.[item.revisionHistory.length - 1]?.at || item.updatedAt || item.createdAt;
@@ -2964,6 +3147,7 @@
       $('editorTitle').textContent = 'Add FAQ';
       $('editorName').value = '';
       $('itemQuestion').value = '';
+      $('itemImportant').checked = false;
       $('itemAnswer').innerHTML = '';
       $('answerImageInput').value = '';
       pendingImageData = '';
@@ -2987,6 +3171,7 @@
       toggleCustomCategoryInput();
       $('editorName').value = item.author || '';
       $('itemQuestion').value = item.question;
+      $('itemImportant').checked = Boolean(item.important);
       $('itemAnswer').innerHTML = answerContentToHtml(item.answer);
       $('answerImageInput').value = '';
       pendingImageData = item.imageData || '';
@@ -3215,7 +3400,8 @@
       const categoryId = $('itemCategory').value;
       const author = $('editorName').value.trim();
       const question = $('itemQuestion').value.trim();
-      let answer = sanitizeNoticeHtml($('itemAnswer').innerHTML).trim();
+      const important = $('itemImportant').checked;
+      let answer = linkifyHtml(sanitizeNoticeHtml($('itemAnswer').innerHTML)).trim();
       const hasAnswer = $('itemAnswer').textContent.trim() || /<img\b/i.test(answer);
       if (categoryId === '__custom__') return alert('직접 입력한 카테고리를 먼저 추가해 주세요.');
       if (!categoryId || !author || !question || !hasAnswer) return alert('카테고리, 작성자, 질문, 답변을 모두 입력해 주세요.');
@@ -3235,9 +3421,9 @@
         if (state.selectedItemId) {
           const item = selectedItem();
           item.revisionHistory = [...(item.revisionHistory || [{ at: item.createdAt }]), { at: now }];
-          Object.assign(item, { categoryId, author, question, answer, imageData, imagePath, updatedAt: now });
+          Object.assign(item, { categoryId, author, question, important, answer, imageData, imagePath, updatedAt: now });
         } else {
-          const item = { id: itemId, categoryId, author, question, answer, imageData, imagePath, createdAt: now, updatedAt: now, comments: [], revisionHistory: [{ at: now }] };
+          const item = { id: itemId, categoryId, author, question, important, answer, imageData, imagePath, createdAt: now, updatedAt: now, comments: [], revisionHistory: [{ at: now }] };
           state.items.unshift(item);
           state.selectedItemId = item.id;
         }
@@ -3694,6 +3880,26 @@
       document.body.classList.remove('image-lightbox-open');
     }
 
+    function applyAnswerTextColor(colorName) {
+      const selected = getAnswerSelectionRange();
+      if (!selected) return;
+      const { editor, selection, range } = selected;
+      const span = document.createElement('span');
+      span.className = `text-color-${colorName}`;
+      try {
+        range.surroundContents(span);
+      } catch (error) {
+        const fragment = range.extractContents();
+        span.appendChild(fragment);
+        range.insertNode(span);
+      }
+      selection.removeAllRanges();
+      const nextRange = document.createRange();
+      nextRange.selectNodeContents(span);
+      selection.addRange(nextRange);
+      editor.focus();
+    }
+
     function applyAnswerBold() {
       const editor = $('itemAnswer');
       editor.focus();
@@ -3734,6 +3940,10 @@
     $('answerHighlightBtn').onclick = applyAnswerHighlight;
     $('answerFontDownBtn').onclick = () => changeAnswerFontSize(-1);
     $('answerFontUpBtn').onclick = () => changeAnswerFontSize(1);
+    document.querySelectorAll('[data-text-color]').forEach(button => {
+      button.addEventListener('mousedown', event => event.preventDefault());
+      button.onclick = () => applyAnswerTextColor(button.dataset.textColor);
+    });
 
     $('viewerPanel').addEventListener('click', event => {
       const image = event.target.closest('.viewer-answer-text img, .answer-image');

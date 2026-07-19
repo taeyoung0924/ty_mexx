@@ -1590,9 +1590,14 @@
 
     #questionListPanel th { text-align: center; }
     #questionListPanel td { text-align: left; }
+    #questionListPanel td:nth-child(1),
+    #questionListPanel td:nth-child(2),
+    #questionListPanel td:nth-child(4),
+    #questionListPanel td:nth-child(6) { text-align: center; }
 
     #questionListPanel th:last-child,
     #questionListPanel td:last-child {
+      padding-left: 18px;
       padding-right: 18px;
       white-space: nowrap;
     }
@@ -1600,6 +1605,7 @@
     #questionListPanel th:first-child,
     #questionListPanel td:first-child {
       padding-left: 18px;
+      padding-right: 18px;
     }
 
 

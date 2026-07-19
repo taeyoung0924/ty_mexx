@@ -1974,7 +1974,7 @@
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>카테고리</th><th>질문</th><th>작성자</th><th class="col-date">작성일시</th></tr></thead>
+            <thead><tr><th>카테고리</th><th>질문</th><th>작성자</th><th class="col-date">작성일시</th><th>조회수</th></tr></thead>
             <tbody id="itemTableBody"></tbody>
           </table>
         </div>
@@ -2225,7 +2225,9 @@
     const $ = id => document.getElementById(id);
     const makeId = prefix => `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     const nowISO = () => new Date().toISOString();
-    const formatDate = iso => iso ? new Date(iso).toLocaleString('ko-KR') : '-';
+    const formatDate = iso => iso ? new Date(iso).toLocaleString('ko-KR', {
+      year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    }) : '-';
     const formatCompactDate = iso => {
       if (!iso) return '-';
       const date = new Date(iso);
@@ -2412,8 +2414,10 @@
       const rawQuestion = String(item.question || '');
       const important = Boolean(item.important) || rawQuestion.startsWith(IMPORTANT_PREFIX);
       const question = rawQuestion.startsWith(IMPORTANT_PREFIX) ? rawQuestion.slice(IMPORTANT_PREFIX.length) : rawQuestion;
-      const passwordHash = item.passwordHash || revisionHistory.find(entry => entry?.passwordHash)?.passwordHash || '';
-      return { ...item, question, important, passwordHash, comments: item.comments || [], imageData: item.imageData || '', imagePath: item.imagePath || '', revisionHistory };
+      const metadata = revisionHistory.find(entry => entry?.passwordHash || Number.isFinite(Number(entry?.views))) || {};
+      const passwordHash = item.passwordHash || metadata.passwordHash || '';
+      const views = Math.max(0, Number(item.views ?? metadata.views) || 0);
+      return { ...item, question, important, passwordHash, views, comments: item.comments || [], imageData: item.imageData || '', imagePath: item.imagePath || '', revisionHistory };
     }
 
     async function hashItemPassword(password) {
@@ -2424,11 +2428,11 @@
 
     async function verifyItemPassword(item, actionLabel) {
       if (!item?.passwordHash) return true;
-      const password = prompt(`${actionLabel}하려면 글 작성 시 설정한 숫자 4자리 암호를 입력하세요.\n관리자는 Admin을 입력할 수 있습니다.`);
+      const password = prompt(`${actionLabel}하려면 글 작성 시 설정한 숫자 4자리 암호를 입력하세요.`);
       if (password === null) return false;
       if (password === 'Admin') return true;
       if (!/^\d{4}$/.test(password)) {
-        alert('암호는 숫자 4자리 또는 관리자 암호를 정확히 입력해 주세요.');
+        alert('암호는 숫자 4자리로 입력해 주세요.');
         return false;
       }
       if (await hashItemPassword(password) !== item.passwordHash) {
@@ -2511,9 +2515,9 @@
 
     function itemToRow(item, deleted = false) {
       const revisionHistory = [...(item.revisionHistory || [])];
-      if (item.passwordHash) {
+      if (item.passwordHash || Number(item.views) > 0) {
         if (!revisionHistory.length) revisionHistory.push({ at: item.createdAt });
-        revisionHistory[0] = { ...revisionHistory[0], passwordHash: item.passwordHash };
+        revisionHistory[0] = { ...revisionHistory[0], passwordHash: item.passwordHash || '', views: Math.max(0, Number(item.views) || 0) };
       }
       return {
         id: item.id,
@@ -2884,7 +2888,8 @@
           <td class="${item.important ? 'important-title' : ''}">${item.important ? '<span class="important-badge">중요</span>' : ''}${escapeHtml(item.question)}</td>
           <td>${escapeHtml(item.author || '-')}</td>
           <td class="col-date">${formatDate(item.createdAt)}</td>
-        </tr>`).join('') : '<tr><td colspan="4" class="empty">검색 결과가 없습니다.</td></tr>';
+          <td>${Math.max(0, Number(item.views) || 0).toLocaleString('ko-KR')}</td>
+        </tr>`).join('') : '<tr><td colspan="5" class="empty">검색 결과가 없습니다.</td></tr>';
       document.querySelectorAll('[data-item]').forEach(row => row.onclick = () => {
         selectItem(row.dataset.item);
         $('viewerPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -3237,6 +3242,8 @@
       state.selectedItemId = id;
       const item = selectedItem();
       if (!item) return;
+      item.views = Math.max(0, Number(item.views) || 0) + 1;
+      saveData();
       $('editorTitle').textContent = 'Add FAQ';
       $('itemCategory').value = item.categoryId;
       toggleCustomCategoryInput();
@@ -3501,7 +3508,7 @@
           Object.assign(item, { categoryId, author, question, important, answer, imageData, imagePath, updatedAt: now });
         } else {
           const passwordHash = await hashItemPassword(password);
-          const item = { id: itemId, categoryId, author, question, important, answer, imageData, imagePath, passwordHash, createdAt: now, updatedAt: now, comments: [], revisionHistory: [{ at: now, passwordHash }] };
+          const item = { id: itemId, categoryId, author, question, important, answer, imageData, imagePath, passwordHash, views: 0, createdAt: now, updatedAt: now, comments: [], revisionHistory: [{ at: now, passwordHash, views: 0 }] };
           state.items.unshift(item);
           state.selectedItemId = item.id;
         }

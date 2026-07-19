@@ -2424,10 +2424,11 @@
 
     async function verifyItemPassword(item, actionLabel) {
       if (!item?.passwordHash) return true;
-      const password = prompt(`${actionLabel}하려면 글 작성 시 설정한 숫자 4자리 암호를 입력하세요.`);
+      const password = prompt(`${actionLabel}하려면 글 작성 시 설정한 숫자 4자리 암호를 입력하세요.\n관리자는 Admin을 입력할 수 있습니다.`);
       if (password === null) return false;
+      if (password === 'Admin') return true;
       if (!/^\d{4}$/.test(password)) {
-        alert('암호는 숫자 4자리로 입력해 주세요.');
+        alert('암호는 숫자 4자리 또는 관리자 암호를 정확히 입력해 주세요.');
         return false;
       }
       if (await hashItemPassword(password) !== item.passwordHash) {

@@ -347,10 +347,11 @@
     .field { display: grid; gap: 5px; }
     .field label { color: var(--sub); font-weight: 600; }
     .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .category-input-row { display: grid; grid-template-columns: 1fr; gap: 7px; }
+    .category-input-row { display: grid; grid-template-columns: 1fr; gap: 7px; width: min(100%, 260px); }
     .category-input-row > * { min-width: 0; }
-    .category-input-row.custom-active { grid-template-columns: minmax(84px, .8fr) minmax(0, 1.2fr) 42px; }
+    .category-input-row.custom-active { grid-template-columns: minmax(120px, .8fr) minmax(180px, 1.2fr) 42px; width: min(100%, 520px); }
     .category-input-row.custom-active .btn { width: 42px; padding-inline: 3px; white-space: nowrap; }
+    .author-password-row { display: grid; grid-template-columns: minmax(150px, 220px) minmax(150px, 190px); gap: 12px; align-items: start; }
     .editor-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
     .editor-note { padding: 10px; color: var(--sub); line-height: 1.6; background: var(--surface-soft); border-radius: 8px; }
     .revision-panel { padding-top: 12px; border-top: 1px solid var(--line); }
@@ -372,6 +373,7 @@
       .category-toolbar { grid-template-columns: 1fr; }
       .category-toolbar-actions { display: grid; grid-template-columns: repeat(4, 1fr); }
       .category-input-row.custom-active { grid-template-columns: 1fr; }
+      .author-password-row { grid-template-columns: 1fr; }
       .viewer-head { grid-template-columns: 48px 1fr; }
       .viewer-meta { grid-column: 2; text-align: left; }
       .viewer-answer { grid-template-columns: 48px 1fr; }
@@ -2023,7 +2025,10 @@
             <button class="btn btn-primary hidden" type="button" id="confirmCustomCategoryBtn">추가</button>
           </div>
         </div>
-        <div class="field"><label for="editorName">작성자</label><input type="text" id="editorName" placeholder="이름"></div>
+        <div class="author-password-row">
+          <div class="field"><label for="editorName">작성자</label><input type="text" id="editorName" placeholder="이름"></div>
+          <div class="field" id="itemPasswordField"><label for="itemPassword">수정·삭제 암호</label><input type="password" id="itemPassword" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" placeholder="숫자 4자리"><span class="muted">수정·삭제 시 필요합니다.</span></div>
+        </div>
         <div class="field">
           <label for="itemQuestion">질문</label>
           <div class="question-important-row">
@@ -2407,7 +2412,29 @@
       const rawQuestion = String(item.question || '');
       const important = Boolean(item.important) || rawQuestion.startsWith(IMPORTANT_PREFIX);
       const question = rawQuestion.startsWith(IMPORTANT_PREFIX) ? rawQuestion.slice(IMPORTANT_PREFIX.length) : rawQuestion;
-      return { ...item, question, important, comments: item.comments || [], imageData: item.imageData || '', imagePath: item.imagePath || '', revisionHistory };
+      const passwordHash = item.passwordHash || revisionHistory.find(entry => entry?.passwordHash)?.passwordHash || '';
+      return { ...item, question, important, passwordHash, comments: item.comments || [], imageData: item.imageData || '', imagePath: item.imagePath || '', revisionHistory };
+    }
+
+    async function hashItemPassword(password) {
+      const bytes = new TextEncoder().encode(`rsdc-faq:${password}`);
+      const digest = await crypto.subtle.digest('SHA-256', bytes);
+      return [...new Uint8Array(digest)].map(value => value.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function verifyItemPassword(item, actionLabel) {
+      if (!item?.passwordHash) return true;
+      const password = prompt(`${actionLabel}하려면 글 작성 시 설정한 숫자 4자리 암호를 입력하세요.`);
+      if (password === null) return false;
+      if (!/^\d{4}$/.test(password)) {
+        alert('암호는 숫자 4자리로 입력해 주세요.');
+        return false;
+      }
+      if (await hashItemPassword(password) !== item.passwordHash) {
+        alert('암호가 일치하지 않습니다.');
+        return false;
+      }
+      return true;
     }
 
     function loadLocalData() {
@@ -2482,6 +2509,11 @@
     }
 
     function itemToRow(item, deleted = false) {
+      const revisionHistory = [...(item.revisionHistory || [])];
+      if (item.passwordHash) {
+        if (!revisionHistory.length) revisionHistory.push({ at: item.createdAt });
+        revisionHistory[0] = { ...revisionHistory[0], passwordHash: item.passwordHash };
+      }
       return {
         id: item.id,
         category_id: item.categoryId || null,
@@ -2491,7 +2523,7 @@
         image_url: item.imageData || null,
         image_path: item.imagePath || null,
         comments: item.comments || [],
-        revision_history: item.revisionHistory || [],
+        revision_history: revisionHistory,
         created_at: item.createdAt,
         updated_at: item.updatedAt,
         is_deleted: deleted,
@@ -3182,6 +3214,8 @@
       state.selectedNoticeId = null;
       $('editorTitle').textContent = 'Add FAQ';
       $('editorName').value = '';
+      $('itemPassword').value = '';
+      $('itemPasswordField').classList.remove('hidden');
       $('itemQuestion').value = '';
       $('itemImportant').checked = false;
       $('itemAnswer').innerHTML = '';
@@ -3206,6 +3240,8 @@
       $('itemCategory').value = item.categoryId;
       toggleCustomCategoryInput();
       $('editorName').value = item.author || '';
+      $('itemPassword').value = '';
+      $('itemPasswordField').classList.add('hidden');
       $('itemQuestion').value = item.question;
       $('itemImportant').checked = Boolean(item.important);
       $('itemAnswer').innerHTML = answerContentToHtml(item.answer);
@@ -3390,10 +3426,12 @@
       return uploadInlineNoticeImages(itemId, html);
     }
 
-    function editSelectedContent() {
+    async function editSelectedContent() {
       const notice = selectedNotice();
       if (notice) return openNoticeModal(notice.type, notice);
-      if (!selectedItem()) return alert('수정할 질문이나 공지를 선택해 주세요.');
+      const item = selectedItem();
+      if (!item) return alert('수정할 질문이나 공지를 선택해 주세요.');
+      if (!await verifyItemPassword(item, '수정')) return;
       showEditorMode(true);
     }
 
@@ -3437,10 +3475,12 @@
       const author = $('editorName').value.trim();
       const question = $('itemQuestion').value.trim();
       const important = $('itemImportant').checked;
+      const password = $('itemPassword').value.trim();
       let answer = linkifyHtml(sanitizeNoticeHtml($('itemAnswer').innerHTML)).trim();
       const hasAnswer = $('itemAnswer').textContent.trim() || /<img\b/i.test(answer);
       if (categoryId === '__custom__') return alert('직접 입력한 카테고리를 먼저 추가해 주세요.');
       if (!categoryId || !author || !question || !hasAnswer) return alert('카테고리, 작성자, 질문, 답변을 모두 입력해 주세요.');
+      if (!state.selectedItemId && !/^\d{4}$/.test(password)) return alert('수정·삭제 암호를 숫자 4자리로 입력해 주세요.');
       const now = nowISO();
       const itemId = state.selectedItemId || makeId('faq');
       $('saveItemBtn').disabled = true;
@@ -3459,13 +3499,16 @@
           item.revisionHistory = [...(item.revisionHistory || [{ at: item.createdAt }]), { at: now }];
           Object.assign(item, { categoryId, author, question, important, answer, imageData, imagePath, updatedAt: now });
         } else {
-          const item = { id: itemId, categoryId, author, question, important, answer, imageData, imagePath, createdAt: now, updatedAt: now, comments: [], revisionHistory: [{ at: now }] };
+          const passwordHash = await hashItemPassword(password);
+          const item = { id: itemId, categoryId, author, question, important, answer, imageData, imagePath, passwordHash, createdAt: now, updatedAt: now, comments: [], revisionHistory: [{ at: now, passwordHash }] };
           state.items.unshift(item);
           state.selectedItemId = item.id;
         }
         await saveData(true);
+        state.page = 1;
         clearForm();
         renderAll();
+        showBrowseMode(true);
         alert('저장되었습니다.');
       } catch (error) {
         updateSupabaseStatus(`저장 실패: ${error.message || error}`, 'error');
@@ -3635,9 +3678,10 @@
       $('supabaseStatus').classList.toggle('error', type === 'error');
     }
 
-    function deleteItem() {
+    async function deleteItem() {
       const item = selectedItem();
       if (!item) return alert('삭제할 질문을 먼저 선택해 주세요.');
+      if (!await verifyItemPassword(item, '삭제')) return;
       if (!confirm(`'${item.question}' 질문을 삭제하시겠습니까?`)) return;
       moveItemToTrash(item, state.categories.find(category => category.id === item.categoryId));
       state.items = state.items.filter(row => row.id !== item.id);

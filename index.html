@@ -1557,6 +1557,12 @@
 
       #questionListPanel th:nth-child(2),
       #questionListPanel td:nth-child(2) {
+        width: 62px;
+        white-space: nowrap;
+      }
+
+      #questionListPanel th:nth-child(3),
+      #questionListPanel td:nth-child(3) {
         width: auto;
         min-width: 0;
         overflow: hidden;
@@ -1564,30 +1570,30 @@
         white-space: nowrap;
       }
 
-      #questionListPanel th:nth-child(3),
-      #questionListPanel td:nth-child(3) {
-        width: 100px;
-      }
-
       #questionListPanel th:nth-child(4),
       #questionListPanel td:nth-child(4) {
-        width: 165px;
-        text-align: left;
-        white-space: nowrap;
+        width: 100px;
       }
 
       #questionListPanel th:nth-child(5),
       #questionListPanel td:nth-child(5) {
+        width: 165px;
+        white-space: nowrap;
+      }
+
+      #questionListPanel th:nth-child(6),
+      #questionListPanel td:nth-child(6) {
         width: 72px;
-        text-align: right;
         white-space: nowrap;
       }
     }
 
+    #questionListPanel th { text-align: center; }
+    #questionListPanel td { text-align: left; }
+
     #questionListPanel th:last-child,
     #questionListPanel td:last-child {
       padding-right: 18px;
-      text-align: right;
       white-space: nowrap;
     }
 
@@ -1993,7 +1999,7 @@
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>카테고리</th><th>질문</th><th>작성자</th><th class="col-date">작성일시</th><th>조회수</th></tr></thead>
+            <thead><tr><th>카테고리</th><th>중요</th><th>질문</th><th>작성자</th><th class="col-date">작성일시</th><th>조회수</th></tr></thead>
             <tbody id="itemTableBody"></tbody>
           </table>
         </div>
@@ -2904,11 +2910,12 @@
       $('itemTableBody').innerHTML = items.length ? items.map(item => `
         <tr data-item="${item.id}" class="${item.id === state.selectedItemId ? 'active' : ''}">
           <td>${escapeHtml(categoryName(item.categoryId))}</td>
-          <td class="${item.important ? 'important-title' : ''}">${item.important ? '<span class="important-badge">중요</span>' : ''}${escapeHtml(item.question)}</td>
+          <td>${item.important ? '<span class="important-badge">중요</span>' : ''}</td>
+          <td class="${item.important ? 'important-title' : ''}">${escapeHtml(item.question)}</td>
           <td>${escapeHtml(item.author || '-')}</td>
           <td class="col-date">${formatDate(item.createdAt)}</td>
           <td>${Math.max(0, Number(item.views) || 0).toLocaleString('ko-KR')}</td>
-        </tr>`).join('') : '<tr><td colspan="5" class="empty">검색 결과가 없습니다.</td></tr>';
+        </tr>`).join('') : '<tr><td colspan="6" class="empty">검색 결과가 없습니다.</td></tr>';
       document.querySelectorAll('[data-item]').forEach(row => row.onclick = () => {
         selectItem(row.dataset.item);
         $('viewerPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
